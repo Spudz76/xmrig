@@ -408,14 +408,19 @@ static NOINLINE void cn_implode_scratchpad(cryptonight_ctx *ctx)
 {
     constexpr CnAlgo<ALGO> props;
 
+#   ifdef XMRIG_ALGO_CN_GPU
+    constexpr bool IS_HEAVY = props.isHeavy() || ALGO == Algorithm::CN_GPU;
+#   else
+    constexpr bool IS_HEAVY = props.isHeavy();
+#   endif
+
 #   ifdef XMRIG_VAES
-    if (!SOFT_AES && !props.isHeavy() && cn_vaes_enabled) {
+    if (!SOFT_AES && !IS_HEAVY && cn_vaes_enabled) {
         cn_implode_scratchpad_vaes(ctx, props.memory(), props.half_mem());
         return;
     }
 #   endif
 
-    constexpr bool IS_HEAVY = props.isHeavy();
     constexpr size_t N = (props.memory() / sizeof(__m128i)) / (props.half_mem() ? 2 : 1);
 
     __m128i xout0, xout1, xout2, xout3, xout4, xout5, xout6, xout7;
@@ -845,6 +850,73 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
 
 
 } /* namespace xmrig */
+
+
+#ifdef XMRIG_ALGO_CN_GPU
+template<size_t ITER, uint32_t MASK>
+void cn_gpu_inner_avx(const uint8_t *spad, uint8_t *lpad);
+
+
+template<size_t ITER, uint32_t MASK>
+void cn_gpu_inner_ssse3(const uint8_t *spad, uint8_t *lpad);
+
+
+namespace xmrig {
+
+
+template<size_t MEM>
+void cn_explode_scratchpad_gpu(const uint8_t *input, uint8_t *output)
+{
+    constexpr size_t hash_size = 200; // 25x8 bytes
+    alignas(16) uint64_t hash[25];
+
+    for (uint64_t i = 0; i < MEM / 512; i++) {
+        memcpy(hash, input, hash_size);
+        hash[0] ^= i;
+
+        xmrig::keccakf(hash, 24);
+        memcpy(output, hash, 160);
+        output += 160;
+
+        xmrig::keccakf(hash, 24);
+        memcpy(output, hash, 176);
+        output += 176;
+
+        xmrig::keccakf(hash, 24);
+        memcpy(output, hash, 176);
+        output += 176;
+    }
+}
+
+
+template<Algorithm::Id ALGO, bool SOFT_AES>
+inline void cryptonight_single_hash_gpu(const uint8_t *__restrict__ input, size_t size, uint8_t *__restrict__ output, cryptonight_ctx **__restrict__ ctx, uint64_t)
+{
+    constexpr CnAlgo<ALGO> props;
+
+    keccak(input, size, ctx[0]->state);
+    cn_explode_scratchpad_gpu<props.memory()>(ctx[0]->state, ctx[0]->memory);
+
+#   ifdef _MSC_VER
+    _control87(RC_NEAR, MCW_RC);
+#   else
+    fesetround(FE_TONEAREST);
+#   endif
+
+    if (xmrig::Cpu::info()->hasAVX2()) {
+        cn_gpu_inner_avx<props.iterations(), props.mask()>(ctx[0]->state, ctx[0]->memory);
+    } else {
+        cn_gpu_inner_ssse3<props.iterations(), props.mask()>(ctx[0]->state, ctx[0]->memory);
+    }
+
+    cn_implode_scratchpad<ALGO, SOFT_AES>(reinterpret_cast<const __m128i *>(ctx[0]->memory), reinterpret_cast<__m128i *>(ctx[0]->state));
+    keccakf(reinterpret_cast<uint64_t*>(ctx[0]->state), 24);
+    memcpy(output, ctx[0]->state, 32);
+}
+
+
+} /* namespace xmrig */
+#endif
 
 
 #ifdef XMRIG_FEATURE_ASM

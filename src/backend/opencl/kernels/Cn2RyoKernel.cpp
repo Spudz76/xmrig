@@ -5,8 +5,8 @@
  * Copyright 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
  * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
  * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
- * Copyright 2018-2020 SChernykh   <https://github.com/SChernykh>
- * Copyright 2016-2020 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright 2018-2019 SChernykh   <https://github.com/SChernykh>
+ * Copyright 2016-2019 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -23,44 +23,31 @@
  */
 
 
-#include "backend/opencl/cl/OclSource.h"
-#include "backend/opencl/cl/cn/cryptonight_cl.h"
-#include "base/crypto/Algorithm.h"
+#include "backend/opencl/kernels/Cn2RyoKernel.h"
+#include "backend/opencl/wrappers/OclLib.h"
 
 
-#ifdef XMRIG_ALGO_RANDOMX
-#   include "backend/opencl/cl/rx/randomx_cl.h"
-#endif
-
-#ifdef XMRIG_ALGO_KAWPOW
-#   include "backend/opencl/cl/kawpow/kawpow_cl.h"
-#   include "backend/opencl/cl/kawpow/kawpow_dag_cl.h"
-#endif
-
-#ifdef XMRIG_ALGO_CN_GPU
-#   include "backend/opencl/cl/cn/cryptonight_gpu_cl.h"
-#endif
-
-
-const char *xmrig::OclSource::get(const Algorithm &algorithm)
+void xmrig::Cn2RyoKernel::enqueue(cl_command_queue queue, uint32_t nonce, size_t threads)
 {
-#   ifdef XMRIG_ALGO_RANDOMX
-    if (algorithm.family() == Algorithm::RANDOM_X) {
-        return randomx_cl;
-    }
-#   endif
+    const size_t offset[2]          = { nonce, 1 };
+    const size_t gthreads[2]        = { threads, 8 };
+    static const size_t lthreads[2] = { 8, 8 };
 
-#   ifdef XMRIG_ALGO_KAWPOW
-    if (algorithm.family() == Algorithm::KAWPOW) {
-        return kawpow_dag_cl;
-    }
-#   endif
+    enqueueNDRange(queue, 2, offset, gthreads, lthreads);
+}
 
-#   ifdef XMRIG_ALGO_CN_GPU
-    if (algorithm == Algorithm::CN_GPU) {
-        return cryptonight_gpu_cl;
-    }
-#   endif
 
-    return cryptonight_cl;
+// __kernel void cn2(__global uint4 *Scratchpad, __global ulong *states, __global uint *output, ulong Target, uint Threads)
+void xmrig::Cn2RyoKernel::setArgs(cl_mem scratchpads, cl_mem states, cl_mem output, uint32_t threads)
+{
+    setArg(0, sizeof(cl_mem), &scratchpads);
+    setArg(1, sizeof(cl_mem), &states);
+    setArg(2, sizeof(cl_mem), &output);
+    setArg(4, sizeof(uint32_t), &threads);
+}
+
+
+void xmrig::Cn2RyoKernel::setTarget(uint64_t target)
+{
+    setArg(3, sizeof(cl_ulong), &target);
 }
