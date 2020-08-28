@@ -52,6 +52,12 @@
 #   endif
 #endif
 
+#if defined(__INTEL_COMPILER)
+#define __INTELC_MAJOR__ ((__INTEL_COMPILER / 100) >> 0)
+#define __INTELC_MINOR__ (((__INTEL_COMPILER - (__INTELC_MAJOR__ * 100)) / 10) >> 0)
+#define __INTELC_PATCH__ (__INTEL_COMPILER - (__INTELC_MAJOR__ * 100) - (__INTELC_MINOR__ * 10))
+#endif
+
 #ifdef XMRIG_OS_WIN
 #    define APP_OS "Windows"
 #elif defined XMRIG_OS_IOS
