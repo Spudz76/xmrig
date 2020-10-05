@@ -5,9 +5,8 @@
  * Copyright 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
  * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
  * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
- * Copyright 2018      Lee Clagett <https://github.com/vtnerd>
  * Copyright 2018-2019 SChernykh   <https://github.com/SChernykh>
- * Copyright 2016-2018 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright 2016-2019 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -23,47 +22,27 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_CRYPTONIGHT_H
-#define XMRIG_CRYPTONIGHT_H
+#ifndef XMRIG_CN1RYOKERNEL_H
+#define XMRIG_CN1RYOKERNEL_H
 
 
-#include <stddef.h>
-#include <stdint.h>
-
-#if defined _MSC_VER || defined XMRIG_ARM || defined __INTEL_COMPILER
-#   define ABI_ATTRIBUTE
-#else
-#   define ABI_ATTRIBUTE __attribute__((ms_abi))
-#endif
+#include "backend/opencl/wrappers/OclKernel.h"
 
 
-struct cryptonight_ctx;
-typedef void(*cn_mainloop_fun_ms_abi)(cryptonight_ctx**) ABI_ATTRIBUTE;
+namespace xmrig {
 
 
-struct cryptonight_r_data {
-    int algo;
-    uint64_t height;
+class Cn1RyoKernel : public OclKernel
+{
+public:
+    inline Cn1RyoKernel(cl_program program) : OclKernel(program, "cn1") {}
 
-    bool match(const int a, const uint64_t h) const { return (a == algo) && (h == height); }
+    void enqueue(cl_command_queue queue, size_t threads, size_t worksize);
+    void setArgs(cl_mem scratchpads, cl_mem states, uint32_t threads);
 };
 
 
-struct cryptonight_ctx {
-    alignas(16) uint8_t state[224];
-    alignas(16) uint8_t *memory;
-    const uint32_t* tweak1_table;
-    uint64_t tweak1_2;
-
-    uint8_t unused[24];
-    const uint32_t *saes_table;
-
-    cn_mainloop_fun_ms_abi generated_code;
-    cryptonight_r_data generated_code_data;
-
-    alignas(16) uint8_t save_state[128];
-    bool first_half;
-};
+} // namespace xmrig
 
 
-#endif /* XMRIG_CRYPTONIGHT_H */
+#endif /* XMRIG_CN1RYOKERNEL_H */
