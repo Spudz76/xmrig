@@ -54,7 +54,7 @@ const RandomX_ConfigurationBase *xmrig::RxAlgo::base(Algorithm::Id algorithm)
 #   endif
 
     case Algorithm::RX_XLA:
-        return &RandomX_ScalaConfig;
+        return &RandomX_Scala2Config;
 
     default:
         break;

@@ -160,7 +160,7 @@ struct RandomX_ConfigurationKeva : public RandomX_ConfigurationBase { RandomX_Co
 #ifdef XMRIG_ALGO_RX_YADA
 struct RandomX_ConfigurationYada : public RandomX_ConfigurationBase { RandomX_ConfigurationYada(); };
 #endif
-struct RandomX_ConfigurationScala : public RandomX_ConfigurationBase { RandomX_ConfigurationScala(); };
+struct RandomX_ConfigurationScala2 : public RandomX_ConfigurationBase { RandomX_ConfigurationScala2(); };
 
 extern RandomX_ConfigurationMonero RandomX_MoneroConfig;
 extern RandomX_ConfigurationWownero RandomX_WowneroConfig;
@@ -172,7 +172,7 @@ extern RandomX_ConfigurationKeva RandomX_KevaConfig;
 #ifdef XMRIG_ALGO_RX_YADA
 extern RandomX_ConfigurationYada RandomX_YadaConfig;
 #endif
-extern RandomX_ConfigurationScala RandomX_ScalaConfig;
+extern RandomX_ConfigurationScala2 RandomX_Scala2Config;
 
 extern RandomX_ConfigurationBase RandomX_CurrentConfig;
 
