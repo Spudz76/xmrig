@@ -42,6 +42,15 @@ function cn_r()
 }
 
 
+function cn_gpu()
+{
+    const cn_gpu = opencl_minify(addIncludes('cryptonight_gpu.cl', [ 'wolf-aes.cl', 'keccak.cl' ]));
+
+    // fs.writeFileSync('cryptonight_gpu_gen.cl', cn_gpu);
+    fs.writeFileSync('cryptonight_gpu_cl.h', text2h(cn_gpu, 'xmrig', 'cryptonight_gpu_cl'));
+}
+
+
 function rx()
 {
     let rx = addIncludes('randomx.cl', [
@@ -90,6 +99,7 @@ const cwd = process.cwd();
 process.chdir(path.resolve(cwd, 'cn'));
 cn();
 cn_r();
+cn_gpu();
 
 process.chdir(path.resolve(cwd, 'rx'));
 rx();
