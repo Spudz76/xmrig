@@ -345,7 +345,7 @@ xmrig::CpuThreads xmrig::BasicCpuInfo::threads(const Algorithm &algorithm, uint3
 
 #   ifdef XMRIG_ALGO_CN_FEMTO
     if (f == Algorithm::CN_FEMTO) {
-        return CpuThreads(count, 2);
+        return CpuThreads(count_limit, 2);
     }
 #   endif
 
@@ -387,7 +387,7 @@ xmrig::CpuThreads xmrig::BasicCpuInfo::threads(const Algorithm &algorithm, uint3
 
 #   ifdef XMRIG_ALGO_GHOSTRIDER
     if (f == Algorithm::GHOSTRIDER) {
-        return CpuThreads(std::max<size_t>(count / 2, 1), 8);
+        return CpuThreads(count_limit2, 8);
     }
 #   endif
 
