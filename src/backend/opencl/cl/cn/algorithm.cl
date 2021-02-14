@@ -30,6 +30,8 @@
 #define ALGO_AR2_WRKZ       0x61120000
 #define ALGO_KAWPOW_RVN     0x6b0f0000
 
+#define ALGO_RX_XLA         0x721211ff
+
 #define FAMILY_UNKNOWN      0
 #define FAMILY_CN           0x63150000
 #define FAMILY_CN_LITE      0x63140000
