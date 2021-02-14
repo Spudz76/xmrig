@@ -74,6 +74,10 @@ const char *Algorithm::kCN_PICO_TLO     = "cn-pico/tlo";
 const char *Algorithm::kCN_UPX2         = "cn/upx2";
 #endif
 
+#ifdef XMRIG_ALGO_CN_GPU
+const char *Algorithm::kCN_GPU          = "cn/gpu";
+#endif
+
 #ifdef XMRIG_ALGO_RANDOMX
 const char *Algorithm::kRX              = "rx";
 const char *Algorithm::kRX_0            = "rx/0";
@@ -140,6 +144,10 @@ static const std::map<uint32_t, const char *> kAlgorithmNames = {
 
 #   ifdef XMRIG_ALGO_CN_FEMTO
     ALGO_NAME(CN_UPX2),
+#   endif
+
+#   ifdef XMRIG_ALGO_CN_GPU
+    ALGO_NAME(CN_GPU),
 #   endif
 
 #   ifdef XMRIG_ALGO_RANDOMX
@@ -249,6 +257,11 @@ static const std::map<const char *, Algorithm::Id, aliasCompare> kAlgorithmAlias
                                     ALGO_ALIAS(CN_UPX2,         "cryptonight-upx/2"),
 #   endif
 
+#   ifdef XMRIG_ALGO_CN_GPU
+    ALGO_ALIAS_AUTO(CN_GPU),        ALGO_ALIAS(CN_GPU,          "cryptonight/gpu"),
+                                    ALGO_ALIAS(CN_GPU,          "cryptonight_gpu"),
+#   endif
+
 #   ifdef XMRIG_ALGO_RANDOMX
     ALGO_ALIAS_AUTO(RX_0),          ALGO_ALIAS(RX_0,            "randomx/0"),
                                     ALGO_ALIAS(RX_0,            "randomx/test"),
@@ -354,6 +367,9 @@ std::vector<xmrig::Algorithm> xmrig::Algorithm::all(const std::function<bool(con
         CN_HEAVY_0, CN_HEAVY_TUBE, CN_HEAVY_XHV,
         CN_PICO_0, CN_PICO_TLO,
         CN_UPX2,
+#       ifdef XMRIG_ALGO_CN_GPU
+        CN_GPU,
+#       endif
         RX_0, RX_V2, RX_WOW, RX_ARQ, RX_GRAFT, RX_SFX, RX_YADA,
         AR2_CHUKWA, AR2_CHUKWA_V2, AR2_WRKZ,
         KAWPOW_RVN,
