@@ -1088,15 +1088,42 @@ void cn_gpu_inner_ssse3(const uint8_t *spad, uint8_t *lpad);
 namespace xmrig {
 
 
+template<size_t MEM>
+static NOINLINE void cn_explode_scratchpad_gpu(cryptonight_ctx *ctx)
+{
+    const uint8_t* input = reinterpret_cast<const uint8_t*>(ctx->state);
+    uint8_t* output = reinterpret_cast<uint8_t*>(ctx->memory);
+
+    constexpr size_t hash_size = 200; // 25x8 bytes
+    alignas(16) uint64_t hash[25];
+
+    for (uint64_t i = 0; i < MEM / 512; i++) {
+        memcpy(hash, input, hash_size);
+        hash[0] ^= i;
+
+        xmrig::keccakf(hash, 24);
+        memcpy(output, hash, 160);
+        output += 160;
+
+        xmrig::keccakf(hash, 24);
+        memcpy(output, hash, 176);
+        output += 176;
+
+        xmrig::keccakf(hash, 24);
+        memcpy(output, hash, 176);
+        output += 176;
+    }
+}
+
+
 template<Algorithm::Id ALGO, bool SOFT_AES>
 inline void cryptonight_single_hash_gpu(const uint8_t *__restrict__ input, size_t size, uint8_t *__restrict__ output, cryptonight_ctx **__restrict__ ctx, uint64_t height)
 {
     constexpr CnAlgo<ALGO> props;
     constexpr size_t MASK        = props.mask();
-    constexpr Algorithm::Id BASE = props.base();
 
     keccak(input, size, ctx[0]->state);
-    cn_explode_scratchpad<ALGO, SOFT_AES, interleave>(ctx[0]);
+    cn_explode_scratchpad_gpu<props.memory()>(ctx[0]);
 
 #   ifdef _MSC_VER
     _control87(RC_NEAR, MCW_RC);

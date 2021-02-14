@@ -61,6 +61,10 @@ extern bool ocl_generic_cn_generator(const OclDevice &device, const Algorithm &a
 extern bool ocl_generic_cn_gpu_generator(const OclDevice &device, const Algorithm &algorithm, OclThreads &threads);
 #endif
 
+#ifdef XMRIG_ALGO_CN_GPU
+extern bool ocl_generic_cn_gpu_generator(const OclDevice &device, const Algorithm &algorithm, OclThreads &threads);
+#endif
+
 
 static ocl_gen_config_fun generators[] = {
 #   ifdef XMRIG_ALGO_RANDOMX
