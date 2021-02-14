@@ -5,9 +5,8 @@
  * Copyright 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
  * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
  * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
- * Copyright 2018      Lee Clagett <https://github.com/vtnerd>
  * Copyright 2018-2019 SChernykh   <https://github.com/SChernykh>
- * Copyright 2016-2018 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright 2016-2019 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -23,47 +22,32 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_CRYPTONIGHT_H
-#define XMRIG_CRYPTONIGHT_H
+
+#include "backend/opencl/kernels/Cn2RyoKernel.h"
+#include "backend/opencl/wrappers/OclLib.h"
 
 
-#include <stddef.h>
-#include <stdint.h>
+void xmrig::Cn2RyoKernel::enqueue(cl_command_queue queue, uint32_t nonce, size_t threads)
+{
+    const size_t offset[2]          = { nonce, 1 };
+    const size_t gthreads[2]        = { threads, 8 };
+    static const size_t lthreads[2] = { 8, 8 };
 
-#if defined _MSC_VER || defined XMRIG_ARM || defined __INTEL_COMPILER
-#   define ABI_ATTRIBUTE
-#else
-#   define ABI_ATTRIBUTE __attribute__((ms_abi))
-#endif
-
-
-struct cryptonight_ctx;
-typedef void(*cn_mainloop_fun_ms_abi)(cryptonight_ctx**) ABI_ATTRIBUTE;
+    enqueueNDRange(queue, 2, offset, gthreads, lthreads);
+}
 
 
-struct cryptonight_r_data {
-    int algo;
-    uint64_t height;
-
-    bool match(const int a, const uint64_t h) const { return (a == algo) && (h == height); }
-};
-
-
-struct cryptonight_ctx {
-    alignas(16) uint8_t state[224];
-    alignas(16) uint8_t *memory;
-    const uint32_t* tweak1_table;
-    uint64_t tweak1_2;
-
-    uint8_t unused[24];
-    const uint32_t *saes_table;
-
-    cn_mainloop_fun_ms_abi generated_code;
-    cryptonight_r_data generated_code_data;
-
-    alignas(16) uint8_t save_state[128];
-    bool first_half;
-};
+// __kernel void cn2(__global uint4 *Scratchpad, __global ulong *states, __global uint *output, ulong Target, uint Threads)
+void xmrig::Cn2RyoKernel::setArgs(cl_mem scratchpads, cl_mem states, cl_mem output, uint32_t threads)
+{
+    setArg(0, sizeof(cl_mem), &scratchpads);
+    setArg(1, sizeof(cl_mem), &states);
+    setArg(2, sizeof(cl_mem), &output);
+    setArg(4, sizeof(uint32_t), &threads);
+}
 
 
-#endif /* XMRIG_CRYPTONIGHT_H */
+void xmrig::Cn2RyoKernel::setTarget(uint64_t target)
+{
+    setArg(3, sizeof(cl_ulong), &target);
+}
