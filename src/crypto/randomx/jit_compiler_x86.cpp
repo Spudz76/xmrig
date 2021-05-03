@@ -352,10 +352,21 @@ namespace randomx {
 		generateProgramPrologue(prog, pcfg);
 
 		if (RandomX_CurrentConfig.Tweak_V2_PREFETCH) {
-			emit(codeReadDatasetV2, readDatasetV2Size, code, codePos);
+			emit(RandomX_CurrentConfig.codeReadDatasetV2Tweaked, RandomX_CurrentConfig.codeReadDatasetV2TweakedSize, code, codePos);
 		}
 		else {
-			emit(codeReadDataset, readDatasetSize, code, codePos);
+			uint8_t* p;
+			uint32_t n;
+			if (flags & RANDOMX_FLAG_AMD) {
+				p = RandomX_CurrentConfig.codeReadDatasetRyzenTweaked;
+				n = RandomX_CurrentConfig.codeReadDatasetRyzenTweakedSize;
+			}
+			else {
+				p = RandomX_CurrentConfig.codeReadDatasetTweaked;
+				n = RandomX_CurrentConfig.codeReadDatasetTweakedSize;
+			}
+			memcpy(code + codePos, p, n);
+			codePos += n;
 		}
 
 		generateProgramEpilogue(prog, pcfg);
