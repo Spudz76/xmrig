@@ -49,6 +49,7 @@ static const CoinInfo coinInfo[] = {
     { Algorithm::RX_0,            "XMR",      "Monero",       120,    1000000000000,  YELLOW_BG_BOLD( WHITE_BOLD_S " monero  ") },
     { Algorithm::CN_R,            "SUMO",     "Sumokoin",     240,    1000000000,     BLUE_BG_BOLD(   WHITE_BOLD_S " sumo    ") },
     { Algorithm::RX_ARQ,          "ARQ",      "ArQmA",        120,    1000000000,     BLUE_BG_BOLD(   WHITE_BOLD_S " arqma   ") },
+    { Algorithm::RX_XEQ,          "XEQ",      "Equilibria",   120,    10000,          BLUE_BG_BOLD(   WHITE_BOLD_S " equilibria ") },
     { Algorithm::RX_GRAFT,        "GRFT",     "Graft",        120,    10000000000,    BLUE_BG_BOLD(   WHITE_BOLD_S " graft   ") },
     { Algorithm::RX_KEVA,         "KVA",      "Kevacoin",     0,      0,              MAGENTA_BG_BOLD(WHITE_BOLD_S " keva    ") },
 #   ifdef XMRIG_ALGO_RX_YADA
@@ -67,7 +68,6 @@ static_assert(Coin::MAX == sizeof(coinInfo) / sizeof(coinInfo[0]), "size mismatc
 const char *Coin::kDisabled = "DISABLED_COIN";
 const char *Coin::kField    = "coin";
 const char *Coin::kUnknown  = "UNKNOWN_COIN";
-
 
 } /* namespace xmrig */
 

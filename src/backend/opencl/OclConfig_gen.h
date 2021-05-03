@@ -116,6 +116,7 @@ size_t inline generate<Algorithm::RANDOM_X>(Threads<OclThreads> &threads, const 
     auto rx  = OclThreads(devices, Algorithm::RX_0);
     auto wow = OclThreads(devices, Algorithm::RX_WOW);
     auto arq = OclThreads(devices, Algorithm::RX_ARQ);
+    auto xeq = OclThreads(devices, Algorithm::RX_XEQ);
 #   ifdef XMRIG_ALGO_RX_YADA
     auto yda = OclThreads(devices, Algorithm::RX_YADA);
 #   endif
@@ -133,6 +134,10 @@ size_t inline generate<Algorithm::RANDOM_X>(Threads<OclThreads> &threads, const 
         count += threads.move(Algorithm::kRX_YADA, std::move(yda));
     }
 #   endif
+
+    if (!threads.isExist(Algorithm::RX_XEQ) && xeq != rx) {
+        count += threads.move(Algorithm::kRX_XEQ, std::move(xeq));
+    }
 
     count += threads.move(Algorithm::kRX, std::move(rx));
 

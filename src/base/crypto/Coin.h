@@ -34,7 +34,8 @@ public:
         INVALID,
         MONERO,
         SUMO,
-        ARQMA,
+        ARQ,
+        XEQ,
         GRAFT,
         KEVA,
 #       ifdef XMRIG_ALGO_RX_YADA
