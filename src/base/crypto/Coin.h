@@ -34,15 +34,17 @@ public:
         INVALID,
         MONERO,
         SUMO,
-        ARQMA,
+        ARQ,
+        XEQ,
         GRAFT,
-#       ifdef XMRIG_ALGO_RX_YADA
-        YADA,
-#       endif
+        KEVA,
         RAVEN,
         WOWNERO,
         ZEPHYR,
         TOWNFORGE,
+#       ifdef XMRIG_ALGO_RX_YADA
+        YADA,
+#       endif
         MAX
     };
 
