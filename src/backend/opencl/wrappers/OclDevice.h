@@ -51,6 +51,7 @@ public:
     enum Type {
         Unknown,
         Baffin,
+        Ellesmere,
         Polaris,
         Lexa,
         Vega_10,
