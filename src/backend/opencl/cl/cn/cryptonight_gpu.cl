@@ -172,7 +172,7 @@ inline void single_compute_wrap(const uint rot, int4 v0, int4 v1, int4 v2, int4 
 }
 
 
-static const __constant uint look[16][4] = {
+STATIC const __constant uint look[16][4] = {
     {0, 1, 2, 3},
     {0, 2, 3, 1},
     {0, 3, 1, 2},
@@ -195,7 +195,7 @@ static const __constant uint look[16][4] = {
 };
 
 
-static const __constant float ccnt[16] = {
+STATIC const __constant float ccnt[16] = {
     1.34375f,
     1.28125f,
     1.359375f,
@@ -301,7 +301,7 @@ __kernel void cn1(__global int *lpad_in, __global int *spad, uint numThreads)
 }
 
 
-static const __constant uint skip[3] = {
+STATIC const __constant uint skip[3] = {
     20,22,22
 };
 
