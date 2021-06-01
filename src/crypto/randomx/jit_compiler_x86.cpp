@@ -120,6 +120,7 @@ namespace randomx {
 	#define codeReadDatasetLightSshFin ADDR(randomx_program_read_dataset_sshash_fin)
 	#define codeDatasetInit ADDR(randomx_dataset_init)
 	#define codeDatasetInitAVX2_prologue ADDR(randomx_dataset_init_avx2_prologue)
+	#define codeDatasetInitAVX2_loop_begin ADDR(randomx_dataset_init_avx2_loop_begin)
 	#define codeDatasetInitAVX2_loop_end ADDR(randomx_dataset_init_avx2_loop_end)
 	#define codeDatasetInitAVX2_loop_epilogue ADDR(randomx_dataset_init_avx2_epilogue)
 	#define codeDatasetInitAVX2_ssh_load ADDR(randomx_dataset_init_avx2_ssh_load)
@@ -141,7 +142,8 @@ namespace randomx {
 	#define readDatasetLightFinSize (codeLoopStore - codeReadDatasetLightSshFin)
 	#define loopStoreSize (codeLoopEnd - codeLoopStore)
 	#define datasetInitSize (codeDatasetInitAVX2_prologue - codeDatasetInit)
-	#define datasetInitAVX2_prologue_size (codeDatasetInitAVX2_loop_end - codeDatasetInitAVX2_prologue)
+	#define datasetInitAVX2_prologue_size (codeDatasetInitAVX2_loop_begin - codeDatasetInitAVX2_prologue)
+	#define datasetInitAVX2_loop_begin_size (codeDatasetInitAVX2_loop_end - codeDatasetInitAVX2_loop_begin)
 	#define datasetInitAVX2_loop_end_size (codeDatasetInitAVX2_loop_epilogue - codeDatasetInitAVX2_loop_end)
 	#define datasetInitAVX2_epilogue_size (codeDatasetInitAVX2_ssh_load - codeDatasetInitAVX2_loop_epilogue)
 	#define datasetInitAVX2_ssh_load_size (codeDatasetInitAVX2_ssh_prefetch - codeDatasetInitAVX2_ssh_load)
@@ -320,13 +322,13 @@ namespace randomx {
 		vm_flags = flags;
 
 		generateProgramPrologue(prog, pcfg);
-		emit(codeReadDataset, readDatasetSize, code, codePos);
+		emit(RandomX_CurrentConfig.codeReadDatasetTweaked, readDatasetSize, code, codePos);
 		generateProgramEpilogue(prog, pcfg);
 	}
 
 	void JitCompilerX86::generateProgramLight(Program& prog, ProgramConfiguration& pcfg, uint32_t datasetOffset) {
 		generateProgramPrologue(prog, pcfg);
-		emit(codeReadDatasetLightSshInit, readDatasetLightInitSize, code, codePos);
+		emit(RandomX_CurrentConfig.codeReadDatasetLightSshInitTweaked, readDatasetLightInitSize, code, codePos);
 		*(uint32_t*)(code + codePos) = 0xc381;
 		codePos += 2;
 		emit32(datasetOffset / CacheLineSize, code, codePos);
@@ -341,7 +343,7 @@ namespace randomx {
 		uint8_t* p = code;
 		if (initDatasetAVX2) {
 			codePos = 0;
-			emit(codeDatasetInitAVX2_prologue, datasetInitAVX2_prologue_size, code, codePos);
+			emit(RandomX_CurrentConfig.codeDatasetInitAVX2_prologueTweaked, datasetInitAVX2_prologue_size, code, codePos);
 
 			for (unsigned j = 0; j < RandomX_CurrentConfig.CacheAccesses; ++j) {
 				SuperscalarProgram& prog = programs[j];
@@ -357,7 +359,7 @@ namespace randomx {
 					codePos += 3;
 					emit(RandomX_CurrentConfig.codeShhPrefetchTweaked, codeSshPrefetchSize, code, codePos);
 					uint8_t* p = code + codePos;
-					emit(codeDatasetInitAVX2_ssh_prefetch, datasetInitAVX2_ssh_prefetch_size, code, codePos);
+					emit(RandomX_CurrentConfig.codeDatasetInitAVX2_ssh_prefetchTweaked, datasetInitAVX2_ssh_prefetch_size, code, codePos);
 					p[3] += prog.getAddressRegister() << 3;
 				}
 			}
@@ -368,11 +370,11 @@ namespace randomx {
 			constexpr int32_t prologue_size = 320;
 			*(int32_t*)(code + codePos - 4) = prologue_size - codePos;
 
-			emit(codeDatasetInitAVX2_loop_epilogue, datasetInitAVX2_epilogue_size, code, codePos);
+			emit(codeDatasetInitAVX2_epilogue, datasetInitAVX2_epilogue_size, code, codePos);
 			return;
 		}
 
-		memcpy(code + superScalarHashOffset, codeShhInit, codeSshInitSize);
+		memcpy(code + superScalarHashOffset, RandomX_CurrentConfig.codeShhInitTweaked, codeSshInitSize);
 		codePos = superScalarHashOffset + codeSshInitSize;
 		for (unsigned j = 0; j < RandomX_CurrentConfig.CacheAccesses; ++j) {
 			SuperscalarProgram& prog = programs[j];
@@ -402,6 +404,7 @@ namespace randomx {
 	}
 
 	void JitCompilerX86::generateProgramPrologue(Program& prog, ProgramConfiguration& pcfg) {
+		*(uint32_t*)(code + 32) = RandomX_CurrentConfig.DatasetBaseMask_Calculated;
 		codePos = ADDR(randomx_program_prologue_first_load) - ADDR(randomx_program_prologue);
 		*(uint32_t*)(code + codePos + 4) = RandomX_CurrentConfig.ScratchpadL3Mask64_Calculated;
 		*(uint32_t*)(code + codePos + 14) = RandomX_CurrentConfig.ScratchpadL3Mask64_Calculated;
