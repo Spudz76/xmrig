@@ -18,6 +18,7 @@
 
 #include <cinttypes>
 #include <cstdio>
+#include <string>
 #include <uv.h>
 
 
@@ -71,17 +72,32 @@ inline static const char *asmName(Assembly::Id assembly)
 
 static void print_pages(const Config *config)
 {
-    Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s") "%s",
-               "HUGE PAGES", config->cpu().isHugePages() ? (VirtualMemory::isHugepagesAvailable() ? kHugepagesSupported : RED_BOLD("unavailable")) : RED_BOLD("disabled"));
-
+    const bool hugeAvailable = VirtualMemory::isHugepagesAvailable();
+    const bool hugeEnabled   = hugeAvailable && config->cpu().isHugePages();
+    const bool hugeJit       = hugeEnabled && config->cpu().isHugePagesJit();
+    const bool hugeOneGbAvailable = VirtualMemory::isOneGbPagesAvailable();
+    const bool hugeOneGbEnabled   = hugeOneGbAvailable
 #   ifdef XMRIG_ALGO_RANDOMX
-#   ifdef XMRIG_OS_LINUX
-    Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s") "%s",
-               "1GB PAGES", (VirtualMemory::isOneGbPagesAvailable() ? (config->rx().isOneGbPages() ? kHugepagesSupported : YELLOW_BOLD("disabled")) : YELLOW_BOLD("unavailable")));
+        && config->rx().isOneGbPages()
 #   else
-    Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s") "%s", "1GB PAGES", YELLOW_BOLD("unavailable"));
+        && false
 #   endif
-#   endif
+    ;
+    const bool hugeAnyAvailable = hugeAvailable || hugeOneGbAvailable;
+    Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s") "%s%s%s%s%s%s%s%s%s%s%s",
+               "HUGE PAGES",
+               hugeAnyAvailable   ? kHugepagesSupported : YELLOW_BOLD("unavailable"),
+               hugeAnyAvailable   ? " (" : "",
+               hugeAvailable      ? (hugeEnabled ? GREEN_BOLD_S : RED_BOLD_S "-") : "",
+               hugeAvailable      ? std::to_string(config->cpu().defaultHugePageSize() / 1024U).c_str() : "",
+               hugeAvailable      ? "KB" : "",
+               hugeAvailable      ? (hugeJit ? "+" : RED_BOLD_S "-") : "",
+               hugeAvailable      ? "JIT" CLEAR : "",
+               (hugeAvailable && hugeOneGbAvailable) ? " " : "",
+               hugeOneGbAvailable ? (hugeOneGbEnabled ? GREEN_BOLD_S : RED_BOLD_S "-") : "",
+               hugeOneGbAvailable ? "1GB" CLEAR : "",
+               hugeAnyAvailable   ? ")" : ""
+    );
 }
 
 
