@@ -39,6 +39,7 @@ option(WITH_BENCHMARK       "Enable builtin RandomX benchmark and stress test" O
 option(WITH_SECURE_JIT      "Enable secure access to JIT memory" OFF)
 option(WITH_DMI             "Enable DMI/SMBIOS reader" ON)
 option(WITH_PAUSE_PROCESS   "Enable Pause-on-Process feature" ON)
+option(WITH_AUTO_HUGEPAGE   "Enable Automatic setting of nr_hugepages (Linux Only)" OFF)
 option(WITH_MO_BENCHMARK    "Enable Benchmark module and algo-perf feature (for MoneroOcean)" ON)
 
 option(BUILD_STATIC         "Build static binary" OFF)
@@ -205,6 +206,10 @@ else()
             )
         )
             list(APPEND EXTRA_LIBS stdc++fs)
+        endif()
+
+        if (WITH_AUTO_HUGEPAGE)
+          add_definitions(/DXMRIG_FEATURE_AUTO_HUGEPAGE)
         endif()
     elseif (XMRIG_OS_FREEBSD)
         set(EXTRA_LIBS kvm pthread)
