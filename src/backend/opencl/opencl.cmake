@@ -128,6 +128,12 @@ if (WITH_OPENCL)
              src/backend/opencl/runners/OclKawPowRunner.cpp
              src/backend/opencl/runners/tools/OclKawPow.cpp
              )
+
+        if (WITH_KAWPOW_EPOCH)
+             set_source_files_properties(src/backend/opencl/generators/ocl_generic_kawpow_generator.cpp
+                 PROPERTIES COMPILE_DEFINITIONS "EPOCH_LATEST_RVN=${WITH_KAWPOW_EPOCH}"
+             )
+        endif()
     endif()
 
     if (WITH_CN_GPU AND CMAKE_SIZEOF_VOID_P EQUAL 8)

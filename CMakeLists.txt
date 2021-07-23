@@ -13,6 +13,7 @@ option(WITH_RX_XEQ          "Enable RandomX XEQ algorithm (requires RandomX)" ON
 option(WITH_RX_XLA          "Enable panthera algorithm (requires RandomX)" ON)
 option(WITH_ARGON2          "Enable Argon2 algorithms family" ON)
 option(WITH_KAWPOW          "Enable KawPow algorithms family" ON)
+option(WITH_KAWPOW_EPOCH    "Set KawPow algorithm current epoch for sizing" 262)
 option(WITH_GHOSTRIDER      "Enable GhostRider algorithm" ON)
 option(WITH_FLEX            "Enable Flex algorithm" ON)
 option(WITH_HTTP            "Enable HTTP protocol support (client/server)" ON)
