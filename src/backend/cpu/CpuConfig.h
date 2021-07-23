@@ -78,7 +78,11 @@ public:
     inline uint32_t limit() const                       { return m_limit; }
 
 private:
+#   if defined(XMRIG_OS_APPLE) && defined(XMRIG_ARM)
+    constexpr static size_t kDefaultHugePageSizeKb  = 16U;
+#   else
     constexpr static size_t kDefaultHugePageSizeKb  = 2048U;
+#   endif
     constexpr static size_t kOneGbPageSizeKb        = 1048576U;
 
     void generate();
