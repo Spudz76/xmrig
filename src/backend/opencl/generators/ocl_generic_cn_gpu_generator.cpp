@@ -27,6 +27,8 @@
 #include "backend/opencl/OclThreads.h"
 #include "backend/opencl/wrappers/OclDevice.h"
 #include "base/crypto/Algorithm.h"
+#include "base/io/log/Log.h"
+#include "base/io/log/Tags.h"
 
 
 #include <algorithm>
@@ -37,10 +39,11 @@ namespace xmrig {
 
 constexpr const size_t oneMiB = 1024u * 1024u;
 
-
-
 bool ocl_generic_cn_gpu_generator(const OclDevice &device, const Algorithm &algorithm, OclThreads &threads)
 {
+    LOG_VERBOSE("%s " YELLOW_BOLD("cn/gpu algo sizing") "      algorithm:" YELLOW_BOLD("0x%08x"), Tags::opencl(), algorithm);
+    LOG_VERBOSE("%s " YELLOW_BOLD("cn/gpu algo sizing") "         GN_GPU:" YELLOW_BOLD("0x%08x"), Tags::opencl(), Algorithm::CN_GPU);
+    LOG_VERBOSE("%s " YELLOW_BOLD("cn/gpu algo sizing") " algorithm_name:" YELLOW_BOLD("%s"), Tags::opencl(), algorithm.name());
     if (algorithm != Algorithm::CN_GPU) {
         return false;
     }
@@ -61,6 +64,13 @@ bool ocl_generic_cn_gpu_generator(const OclDevice &device, const Algorithm &algo
     }
 
     size_t maxThreads = device.computeUnits() * 6 * 8;
+
+    if (device.vendorId() == OCL_VENDOR_NVIDIA) {
+        LOG_VERBOSE("%s " YELLOW_BOLD("cn/gpu algo sizing") " nvidia OpenCL: changing worksize:  " YELLOW_BOLD("%d->%d"), worksize, device.computeUnits());
+        worksize = device.computeUnits();
+        LOG_VERBOSE("%s " YELLOW_BOLD("cn/gpu algo sizing") " nvidia OpenCL: changing maxThreads:" YELLOW_BOLD("%d->%d"), maxThreads, worksize * 32);
+        maxThreads = worksize * 32;
+    }
 
     const size_t maxAvailableFreeMem = device.freeMemSize() - minFreeMem;
     const size_t memPerThread        = std::min(device.maxMemAllocSize(), maxAvailableFreeMem);
