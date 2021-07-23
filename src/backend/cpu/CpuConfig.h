@@ -74,6 +74,7 @@ public:
     inline const Threads<CpuThreads> &threads() const   { return m_threads; }
     inline int priority() const                         { return m_priority; }
     inline size_t hugePageSize() const                  { return m_hugePageSize * 1024U; }
+    inline size_t defaultHugePageSize() const           { return kDefaultHugePageSizeKb * 1024U; }
     inline uint32_t limit() const                       { return m_limit; }
 
 private:
