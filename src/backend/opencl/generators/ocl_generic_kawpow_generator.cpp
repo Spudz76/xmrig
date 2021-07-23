@@ -27,6 +27,10 @@
 #include "backend/opencl/OclThreads.h"
 #include "backend/opencl/wrappers/OclDevice.h"
 #include "base/crypto/Algorithm.h"
+#ifdef EPOCH_LATEST_RVN
+#include "base/io/log/Log.h"
+#include "base/io/log/Tags.h"
+#endif
 #include "crypto/randomx/randomx.h"
 #include "crypto/rx/RxAlgo.h"
 
@@ -39,6 +43,26 @@ bool ocl_generic_kawpow_generator(const OclDevice &device, const Algorithm &algo
     if (algorithm.family() != Algorithm::KAWPOW) {
         return false;
     }
+
+#   ifdef EPOCH_LATEST_RVN
+    constexpr const size_t oneMiB   = 1024u * 1024u;
+    constexpr const size_t eightKiB = 1024u * 8u;
+    constexpr const size_t CurrentDAGRequirement = (EPOCH_LATEST_RVN * eightKiB) + oneMiB;
+    constexpr const size_t MemGpuMiB = device.globalMemSize() / oneMiB;
+    constexpr const size_t MemDagMiB = CurrentDAGRequirement / oneMiB;
+    if (device.globalMemSize() < CurrentDAGRequirement) {
+        LOG_ERR("%s " RED_BOLD("kawpow algo disabled")
+            YELLOW(" GPU-Mem:") RED_BOLD("%02.3fMB")
+            YELLOW(" is below DAG-Mem:") RED_BOLD("%02.3fMB"),
+            Tags::opencl(), MemGpuMiB, MemDagMiB
+        );
+        return false;
+    }
+    else {
+        LOG_VERBOSE("%s " YELLOW_BOLD("kawpow algo sizing") " GPU-Mem:" YELLOW_BOLD("%02.3fMB"), Tags::opencl(), MemGpuMiB);
+        LOG_VERBOSE("%s " YELLOW_BOLD("kawpow algo sizing") " DAG-Mem:" YELLOW_BOLD("%02.3fMB"), Tags::opencl(), MemDagMiB);
+    }
+#   endif
 
     bool isNavi = false;
 
