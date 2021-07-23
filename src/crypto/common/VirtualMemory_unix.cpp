@@ -184,16 +184,18 @@ void *xmrig::VirtualMemory::allocateLargePagesMemory(size_t size)
     //void *mem = mmap(0, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, VM_FLAGS_SUPERPAGE_SIZE_2MB, 0);
     //printf("mem:%llx\n", &mem);
 #   ifdef XMRIG_ARM
-    #define SUPERPAGE_SIZE getpagesize()
+#       define SUPERPAGE_SIZE getpagesize()
+#       define VM_FLAGS_APPEND 0
 #   else
-    #define SUPERPAGE_SIZE hugePageSize()
+#       define SUPERPAGE_SIZE hugePageSize()
+#       define VM_FLAGS_APPEND VM_FLAGS_SUPERPAGE_SIZE_2MB
 #   endif
     unsigned int huges = size / SUPERPAGE_SIZE + (size % SUPERPAGE_SIZE != 0);
     printf("allocating %d of %zuKB pages\n", huges, SUPERPAGE_SIZE);
     void *mem = MAP_FAILED;
     kern_return_t kr;
     mach_vm_address_t global_addr = 0;
-    kr = mach_vm_allocate(mach_task_self(), &global_addr, size, VM_FLAGS_ANYWHERE);
+    kr = mach_vm_allocate(mach_task_self(), &global_addr, size, VM_FLAGS_ANYWHERE & VM_FLAGS_APPEND);
     printf("kr:%d g_a:%llx\n", kr, global_addr);
     if (!kr && global_addr) mem = (void*)global_addr;
     if (kr) mach_error("", kr);
