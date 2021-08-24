@@ -369,7 +369,7 @@ namespace randomx {
 			codePos += n;
 		}
 
-		emit(RandomX_CurrentConfig.codeReadDatasetTweaked, readDatasetSize, code, codePos);
+		emit(p, n, code, codePos);
 		generateProgramEpilogue(prog, pcfg);
 	}
 
