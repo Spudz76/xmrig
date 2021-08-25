@@ -390,7 +390,7 @@ namespace randomx {
 		uint8_t* p = code;
 		if (initDatasetAVX2) {
 			codePos = 0;
-			emit(RandomX_CurrentConfig.codeDatasetInitAVX2PrologueTweaked, datasetInitAVX2PrologueSize, code, codePos);
+			emit(codeDatasetInitAVX2Prologue, datasetInitAVX2PrologueSize, code, codePos);
 
 			for (unsigned j = 0; j < RandomX_CurrentConfig.CacheAccesses; ++j) {
 				SuperscalarProgram& prog = programs[j];
@@ -406,7 +406,7 @@ namespace randomx {
 					codePos += 3;
 					emit(RandomX_CurrentConfig.codeSshPrefetchTweaked, codeSshPrefetchSize, code, codePos);
 					uint8_t* p = code + codePos;
-					emit(RandomX_CurrentConfig.codeDatasetInitAVX2SshPrefetchTweaked, datasetInitAVX2SshPrefetchSize, code, codePos);
+					emit(codeDatasetInitAVX2SshPrefetch, datasetInitAVX2SshPrefetchSize, code, codePos);
 					p[3] += prog.getAddressRegister() << 3;
 				}
 			}
@@ -414,13 +414,14 @@ namespace randomx {
 			emit(codeDatasetInitAVX2LoopEnd, datasetInitAVX2LoopEndSize, code, codePos);
 
 			// Number of bytes from the start of randomx_dataset_init_avx2_prologue to loop_begin label
-			*(int32_t*)(code + codePos - 4) = ((int32_t)RandomX_CurrentConfig.codeDatasetInitAVX2LoopBeginOffset) - codePos;
+			constexpr int32_t prologue_size = 320;
+			*(int32_t*)(code + codePos - 4) = prologue_size - codePos;
 
 			emit(codeDatasetInitAVX2Epilogue, datasetInitAVX2EpilogueSize, code, codePos);
 			return;
 		}
 
-		memcpy(code + superScalarHashOffset, RandomX_CurrentConfig.codeSshInitTweaked, codeSshInitSize);
+		memcpy(code + superScalarHashOffset, codeSshInit, codeSshInitSize);
 		codePos = superScalarHashOffset + codeSshInitSize;
 		for (unsigned j = 0; j < RandomX_CurrentConfig.CacheAccesses; ++j) {
 			SuperscalarProgram& prog = programs[j];
