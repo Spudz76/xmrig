@@ -244,15 +244,11 @@ RandomX_ConfigurationBase::RandomX_ConfigurationBase()
   }
 	{
 		const uint8_t* a = addr(randomx_program_read_dataset);
-		const uint8_t* b = addr(randomx_program_read_dataset_ryzen);
-		const uint8_t* c = addr(randomx_program_read_dataset_sshash_init);
+		const uint8_t* b = addr(randomx_program_read_dataset_sshash_init);
 		memcpy(codeReadDatasetTweaked, a, b - a);
 		codeReadDatasetTweakedSize = b - a;
-		memcpy(codeReadDatasetRyzenTweaked, b, c - b);
-		codeReadDatasetRyzenTweakedSize = c - b;
 #		if defined(APP_DEBUG) || defined(_MSC_VER)
 		std::cout << "sRDT   :" << std::dec << (b - a) << "\n";
-		std::cout << "sRDRT  :" << std::dec << (c - b) << "\n";
 #		endif
 	}
 	{
@@ -264,37 +260,11 @@ RandomX_ConfigurationBase::RandomX_ConfigurationBase()
 #		endif
 	}
 	{
-		const uint8_t* a = addr(randomx_dataset_init_avx2_prologue);
-		const uint8_t* b = addr(randomx_dataset_init_avx2_loop_begin);
-		const uint8_t* c = addr(randomx_dataset_init_avx2_loop_end);
-		memcpy(codeDatasetInitAVX2PrologueTweaked, a, c - a);
-		codeDatasetInitAVX2LoopBeginOffset = b - a;
-#		if defined(APP_DEBUG) || defined(_MSC_VER)
-		std::cout << "sDIAPT :" << std::dec << (c - a) << "\n";
-#		endif
-	}
-	{
-		const uint8_t* a = addr(randomx_dataset_init_avx2_ssh_prefetch);
-		const uint8_t* b = addr(randomx_program_epilogue);
-		memcpy(codeDatasetInitAVX2SshPrefetchTweaked, a, b - a);
-#		if defined(APP_DEBUG) || defined(_MSC_VER)
-		std::cout << "sDIASPT:" << std::dec << (b - a) << "\n";
-#		endif
-	}
-	{
 		const uint8_t* a = addr(randomx_sshash_prefetch);
 		const uint8_t* b = addr(randomx_sshash_end);
 		memcpy(codeSshPrefetchTweaked, a, b - a);
 #		if defined(APP_DEBUG) || defined(_MSC_VER)
 		std::cout << "sSPT   :" << std::dec << (b - a) << "\n";
-#		endif
-	}
-	{
-		const uint8_t* a = addr(randomx_sshash_init);
-		const uint8_t* b = addr(randomx_program_end);
-		memcpy(codeSshInitTweaked, a, b - a);
-#		if defined(APP_DEBUG) || defined(_MSC_VER)
-		std::cout << "sSIT   :" << std::dec << (b - a) << "\n";
 #		endif
 	}
 #	endif
@@ -329,16 +299,6 @@ void RandomX_ConfigurationBase::Apply()
 #if defined(XMRIG_FEATURE_ASM) && (defined(_M_X64) || defined(__x86_64__))
 #	if defined(APP_DEBUG) || defined(_MSC_VER)
 	std::cout << "\n";
-	std::cout << "aIAPT:0x" << std::hex << (uint64_t)codeDatasetInitAVX2PrologueTweaked << "; oALB:" << std::dec << codeDatasetInitAVX2LoopBeginOffset << "\n";
-//	std::cout << " o34:0x" << std::hex << ((uint32_t*)(codeDatasetInitAVX2PrologueTweaked + codeDatasetInitAVX2LoopBeginOffset +  34))[0] << "\n";
-//	std::cout << " o54:0x" << std::hex << ((uint32_t*)(codeDatasetInitAVX2PrologueTweaked + codeDatasetInitAVX2LoopBeginOffset +  54))[0] << "\n";
-//	std::cout << " o78:0x" << std::hex << ((uint32_t*)(codeDatasetInitAVX2PrologueTweaked + codeDatasetInitAVX2LoopBeginOffset +  78))[0] << "\n";
-//	std::cout << "o103:0x" << std::hex << ((uint32_t*)(codeDatasetInitAVX2PrologueTweaked + codeDatasetInitAVX2LoopBeginOffset + 103))[0] << "\n";
-//	std::cout << "o128:0x" << std::hex << ((uint32_t*)(codeDatasetInitAVX2PrologueTweaked + codeDatasetInitAVX2LoopBeginOffset + 128))[0] << "\n";
-//	std::cout << "\n";
-//	std::cout << "aSIT:0x" << std::hex << (uint64_t)codeSshInitTweaked << "\n";
-//	std::cout << "o7:0x" << std::hex << ((uint32_t*)(codeSshInitTweaked + 7))[0] << "\n";
-//	std::cout << "\n";
 	std::cout << "aRDT:0x" << std::hex << (uint64_t)codeReadDatasetTweaked << "\n";
 	std::cout << "o4: 0x" << std::hex << ((uint32_t*)(codeReadDatasetTweaked +  4))[0] << "\n";
 	std::cout << "o23:0x" << std::hex << ((uint32_t*)(codeReadDatasetTweaked + 23))[0] << "\n";
@@ -349,7 +309,7 @@ void RandomX_ConfigurationBase::Apply()
 	std::cout << "AM:   0x" << std::hex << ArgonMemory * 16 - 1 << "\n";
 	std::cout << "CLAMC:0x" << std::hex << CacheLineAlignMask_Calculated << "\n";
 	std::cout << "DBMC: 0x" << std::hex << DatasetBaseMask_Calculated << "\n";
-	std::cout << "SLMC: 0x" << std::hex << ScratchpadL3Mask64_Calculated << "\n";
+	std::cout << "SLM64C: 0x" << std::hex << ScratchpadL3Mask64_Calculated << "\n";
 #	endif
 
 	*(uint32_t*)(codeSshPrefetchTweaked + 3) = ArgonMemory * 16 - 1;
