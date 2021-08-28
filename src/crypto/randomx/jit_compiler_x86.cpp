@@ -451,7 +451,7 @@ namespace randomx {
 	}
 
 	void JitCompilerX86::generateProgramPrologue(Program& prog, ProgramConfiguration& pcfg) {
-		*(uint32_t*)(code + 32) = RandomX_CurrentConfig.DatasetBaseMask_Calculated;
+		*(uint32_t*)(code + 32) = DatasetBaseMask;
 		codePos = ADDR(randomx_program_prologue_first_load) - ADDR(randomx_program_prologue);
 
 		if (RandomX_CurrentConfig.Tweak_V2_AES && !hasAES) {
