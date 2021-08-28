@@ -331,9 +331,9 @@ void RandomX_ConfigurationBase::Apply()
 	//*(uint32_t*)(codeDatasetInitAVX2SshPrefetchTweaked + 88) = ArgonMemory * 16 - 1;
 	//*(uint32_t*)(codeSshInitTweaked + 7) = ArgonMemory * 16 - 1;
 
-	*(uint32_t*)(codeReadDatasetTweaked + 4) = DatasetBaseMask_Calculated;
-	*(uint32_t*)(codeReadDatasetTweaked + 23) = DatasetBaseMask_Calculated;
-	*(uint32_t*)(codeReadDatasetLightSshInitTweaked + 67) = DatasetBaseMask_Calculated / 64;
+	// *(uint32_t*)(codeReadDatasetTweaked + 4) = DatasetBaseMask_Calculated;
+	// *(uint32_t*)(codeReadDatasetTweaked + 23) = DatasetBaseMask_Calculated;
+	// *(uint32_t*)(codeReadDatasetLightSshInitTweaked + 67) = DatasetBaseMask_Calculated / 64;
 
 	const bool hasBMI2 = xmrig::Cpu::info()->hasBMI2();
 
@@ -369,6 +369,16 @@ void RandomX_ConfigurationBase::Apply()
 			break;
 		}
 	}
+
+#	if defined(APP_DEBUG) || defined(_MSC_VER)
+	std::cout << "\n";
+	std::cout << "aRDT:0x" << std::hex << (uint64_t)codeReadDatasetTweaked << "\n";
+	std::cout << "o4: 0x" << std::hex << ((uint32_t*)(codeReadDatasetTweaked +  4))[0] << "\n";
+	std::cout << "o23:0x" << std::hex << ((uint32_t*)(codeReadDatasetTweaked + 23))[0] << "\n";
+	std::cout << "\n";
+	std::cout << "aRDLSIT:0x" << std::hex << (uint64_t)codeReadDatasetLightSshInitTweaked << "\n";
+	std::cout << "o67:0x" << std::hex << ((uint32_t*)(codeReadDatasetLightSshInitTweaked + 67))[0] << "\n";
+#	endif
 
 typedef void(randomx::JitCompilerX86::* InstructionGeneratorX86_2)(const randomx::Instruction&);
 
