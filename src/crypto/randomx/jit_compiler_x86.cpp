@@ -367,15 +367,16 @@ namespace randomx {
 			}
 			memcpy(code + codePos, p, n);
 			codePos += n;
+
+			emit(p, n, code, codePos);
 		}
 
-		emit(p, n, code, codePos);
 		generateProgramEpilogue(prog, pcfg);
 	}
 
 	void JitCompilerX86::generateProgramLight(Program& prog, ProgramConfiguration& pcfg, uint32_t datasetOffset) {
 		generateProgramPrologue(prog, pcfg);
-		emit(RandomX_CurrentConfig.codeReadDatasetLightSshInitTweaked, readDatasetLightInitSize, code, codePos);
+		emit(codeReadDatasetLightSshInit, readDatasetLightInitSize, code, codePos);
 		*(uint32_t*)(code + codePos) = 0xc381;
 		codePos += 2;
 		emit32(datasetOffset / CacheLineSize, code, codePos);
@@ -451,7 +452,6 @@ namespace randomx {
 	}
 
 	void JitCompilerX86::generateProgramPrologue(Program& prog, ProgramConfiguration& pcfg) {
-		*(uint32_t*)(code + 32) = DatasetBaseMask;
 		codePos = ADDR(randomx_program_prologue_first_load) - ADDR(randomx_program_prologue);
 
 		if (RandomX_CurrentConfig.Tweak_V2_AES && !hasAES) {
