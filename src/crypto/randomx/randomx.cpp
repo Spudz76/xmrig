@@ -224,7 +224,7 @@ RandomX_ConfigurationBase::RandomX_ConfigurationBase()
 		return p;
 	};
 
-  {
+	{
 		const uint8_t* a = addr(randomx_prefetch_scratchpad);
 		const uint8_t* b = addr(randomx_prefetch_scratchpad_bmi2);
 		const uint8_t* c = addr(randomx_prefetch_scratchpad_end);
@@ -241,10 +241,10 @@ RandomX_ConfigurationBase::RandomX_ConfigurationBase()
 		std::cout << "sPST(-BMI2):" << std::dec << (b - a) << "\n";
 		std::cout << "sPST(+BMI2):" << std::dec << (c - b) << "\n";
 #		endif
-  }
+	}
 	{
 		const uint8_t* a = addr(randomx_program_read_dataset);
-		const uint8_t* b = addr(randomx_program_read_dataset_sshash_init);
+		const uint8_t* b = addr(randomx_program_read_dataset_ryzen);
 		memcpy(codeReadDatasetTweaked, a, b - a);
 		codeReadDatasetTweakedSize = b - a;
 #		if defined(APP_DEBUG) || defined(_MSC_VER)
@@ -252,11 +252,12 @@ RandomX_ConfigurationBase::RandomX_ConfigurationBase()
 #		endif
 	}
 	{
-		const uint8_t* a = addr(randomx_program_read_dataset_sshash_init);
-		const uint8_t* b = addr(randomx_program_read_dataset_sshash_fin);
-		memcpy(codeReadDatasetLightSshInitTweaked, a, b - a);
+		const uint8_t* a = addr(randomx_program_read_dataset_ryzen);
+		const uint8_t* b = addr(randomx_program_read_dataset_sshash_init);
+		memcpy(codeReadDatasetRyzenTweaked, a, b - a);
+		codeReadDatasetRyzenTweakedSize = b - a;
 #		if defined(APP_DEBUG) || defined(_MSC_VER)
-		std::cout << "sRDLSIT:" << std::dec << (b - a) << "\n";
+		std::cout << "sRDRT  :" << std::dec << (b - a) << "\n";
 #		endif
 	}
 	{
@@ -303,8 +304,7 @@ void RandomX_ConfigurationBase::Apply()
 	std::cout << "o4: 0x" << std::hex << ((uint32_t*)(codeReadDatasetTweaked +  4))[0] << "\n";
 	std::cout << "o23:0x" << std::hex << ((uint32_t*)(codeReadDatasetTweaked + 23))[0] << "\n";
 	std::cout << "\n";
-	std::cout << "aRDLSIT:0x" << std::hex << (uint64_t)codeReadDatasetLightSshInitTweaked << "\n";
-	std::cout << "o67:0x" << std::hex << ((uint32_t*)(codeReadDatasetLightSshInitTweaked + 67))[0] << "\n";
+	std::cout << "aRDRT:0x" << std::hex << (uint64_t)codeReadDatasetRyzenTweaked << "\n";
 	std::cout << "\n";
 	std::cout << "AM:   0x" << std::hex << ArgonMemory * 16 - 1 << "\n";
 	std::cout << "CLAMC:0x" << std::hex << CacheLineAlignMask_Calculated << "\n";
@@ -313,27 +313,11 @@ void RandomX_ConfigurationBase::Apply()
 #	endif
 
 	*(uint32_t*)(codeSshPrefetchTweaked + 3) = ArgonMemory * 16 - 1;
-	const uint32_t DatasetBaseMask = DatasetBaseSize - RANDOMX_DATASET_ITEM_SIZE;
-	*(uint32_t*)(codeReadDatasetRyzenTweaked + 9) = DatasetBaseMask;
-	*(uint32_t*)(codeReadDatasetRyzenTweaked + 24) = DatasetBaseMask;
-	*(uint32_t*)(codeReadDatasetTweaked + 7) = DatasetBaseMask;
-	*(uint32_t*)(codeReadDatasetTweaked + 23) = DatasetBaseMask;
-//	*(uint32_t*)(codeReadDatasetLightSshInitTweaked + 59) = DatasetBaseMask;
-
-	//*(uint32_t*)(codeDatasetInitAVX2PrologueTweaked + codeDatasetInitAVX2LoopBeginOffset + 34) = CacheLineAlignMask_Calculated;
-	//*(uint32_t*)(codeDatasetInitAVX2PrologueTweaked + codeDatasetInitAVX2LoopBeginOffset + 54) = CacheLineAlignMask_Calculated;
-	//*(uint32_t*)(codeDatasetInitAVX2PrologueTweaked + codeDatasetInitAVX2LoopBeginOffset + 78) = CacheLineAlignMask_Calculated;
-	//*(uint32_t*)(codeDatasetInitAVX2PrologueTweaked + codeDatasetInitAVX2LoopBeginOffset + 103) = CacheLineAlignMask_Calculated;
-	//*(uint32_t*)(codeDatasetInitAVX2PrologueTweaked + codeDatasetInitAVX2LoopBeginOffset + 128) = CacheLineAlignMask_Calculated;
-	//*(uint32_t*)(codeDatasetInitAVX2SshPrefetchTweaked + 11) = ArgonMemory * 16 - 1;
-	//*(uint32_t*)(codeDatasetInitAVX2SshPrefetchTweaked + 36) = ArgonMemory * 16 - 1;
-	//*(uint32_t*)(codeDatasetInitAVX2SshPrefetchTweaked + 62) = ArgonMemory * 16 - 1;
-	//*(uint32_t*)(codeDatasetInitAVX2SshPrefetchTweaked + 88) = ArgonMemory * 16 - 1;
-	//*(uint32_t*)(codeSshInitTweaked + 7) = ArgonMemory * 16 - 1;
-
-	// *(uint32_t*)(codeReadDatasetTweaked + 4) = DatasetBaseMask_Calculated;
-	// *(uint32_t*)(codeReadDatasetTweaked + 23) = DatasetBaseMask_Calculated;
-	// *(uint32_t*)(codeReadDatasetLightSshInitTweaked + 67) = DatasetBaseMask_Calculated / 64;
+	*(uint32_t*)(codeReadDatasetRyzenTweaked + 9) = DatasetBaseMask_Calculated;
+	*(uint32_t*)(codeReadDatasetRyzenTweaked + 24) = DatasetBaseMask_Calculated;
+	*(uint32_t*)(codeReadDatasetTweaked + 7) = DatasetBaseMask_Calculated;
+	*(uint32_t*)(codeReadDatasetTweaked + 23) = DatasetBaseMask_Calculated;
+	//*(uint32_t*)(codeReadDatasetLightSshInitTweaked + 59) = DatasetBaseMask_Calculated;
 
 	const bool hasBMI2 = xmrig::Cpu::info()->hasBMI2();
 
@@ -376,8 +360,7 @@ void RandomX_ConfigurationBase::Apply()
 	std::cout << "o4: 0x" << std::hex << ((uint32_t*)(codeReadDatasetTweaked +  4))[0] << "\n";
 	std::cout << "o23:0x" << std::hex << ((uint32_t*)(codeReadDatasetTweaked + 23))[0] << "\n";
 	std::cout << "\n";
-	std::cout << "aRDLSIT:0x" << std::hex << (uint64_t)codeReadDatasetLightSshInitTweaked << "\n";
-	std::cout << "o67:0x" << std::hex << ((uint32_t*)(codeReadDatasetLightSshInitTweaked + 67))[0] << "\n";
+	std::cout << "aRDRT:0x" << std::hex << (uint64_t)codeReadDatasetRyzenTweaked << "\n";
 #	endif
 
 typedef void(randomx::JitCompilerX86::* InstructionGeneratorX86_2)(const randomx::Instruction&);

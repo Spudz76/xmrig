@@ -115,7 +115,6 @@ namespace randomx {
 	#define codeLoopLoad ADDR(randomx_program_loop_load)
 	#define codeLoopLoadXOP ADDR(randomx_program_loop_load_xop)
 	#define codeProgramStart ADDR(randomx_program_start)
-	#define codeReadDataset ADDR(randomx_program_read_dataset)
 	#define codeReadDatasetLightSshInit ADDR(randomx_program_read_dataset_sshash_init)
 	#define codeReadDatasetLightSshFin ADDR(randomx_program_read_dataset_sshash_fin)
 	#define codeDatasetInit ADDR(randomx_dataset_init)
@@ -136,7 +135,6 @@ namespace randomx {
 	#define prologueSize (codeLoopBegin - codePrologue)
 	#define loopLoadSize (codeLoopLoadXOP - codeLoopLoad)
 	#define loopLoadXOPSize (codeProgramStart - codeLoopLoadXOP)
-	#define readDatasetSize (codeReadDatasetLightSshInit - codeReadDataset)
 	#define readDatasetLightInitSize (codeReadDatasetLightSshFin - codeReadDatasetLightSshInit)
 	#define readDatasetLightFinSize (codeLoopStore - codeReadDatasetLightSshFin)
 	#define loopStoreSize (codeLoopEnd - codeLoopStore)
@@ -341,13 +339,26 @@ namespace randomx {
 		vm_flags = flags;
 
 		generateProgramPrologue(prog, pcfg);
-		emit(codeReadDataset, readDatasetSize, code, codePos);
+
+		uint8_t* p;
+		uint32_t n;
+		if (flags & RANDOMX_FLAG_AMD) {
+			p = RandomX_CurrentConfig.codeReadDatasetRyzenTweaked;
+			n = RandomX_CurrentConfig.codeReadDatasetRyzenTweakedSize;
+		}
+		else {
+			p = RandomX_CurrentConfig.codeReadDatasetTweaked;
+			n = RandomX_CurrentConfig.codeReadDatasetTweakedSize;
+		}
+		memcpy(code + codePos, p, n);
+		codePos += n;
+
 		generateProgramEpilogue(prog, pcfg);
 	}
 
 	void JitCompilerX86::generateProgramLight(Program& prog, ProgramConfiguration& pcfg, uint32_t datasetOffset) {
 		generateProgramPrologue(prog, pcfg);
-		emit(RandomX_CurrentConfig.codeReadDatasetLightSshInitTweaked, readDatasetLightInitSize, code, codePos);
+		emit(codeReadDatasetLightSshInit, readDatasetLightInitSize, code, codePos);
 		*(uint32_t*)(code + codePos) = 0xc381;
 		codePos += 2;
 		emit32(datasetOffset / CacheLineSize, code, codePos);
@@ -423,7 +434,6 @@ namespace randomx {
 	}
 
 	void JitCompilerX86::generateProgramPrologue(Program& prog, ProgramConfiguration& pcfg) {
-		*(uint32_t*)(code + 32) = DatasetBaseMask;
 		codePos = ADDR(randomx_program_prologue_first_load) - ADDR(randomx_program_prologue);
 		*(uint32_t*)(code + codePos + 4) = RandomX_CurrentConfig.ScratchpadL3Mask64_Calculated;
 		*(uint32_t*)(code + codePos + 14) = RandomX_CurrentConfig.ScratchpadL3Mask64_Calculated;
