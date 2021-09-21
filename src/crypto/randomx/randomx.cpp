@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <mutex>
 
 #include <cassert>
-#if defined(APP_DEBUG) || defined(_MSC_VER)
+#if defined(APP_DEBUG)
 #include <iostream>
 #endif
 
@@ -236,7 +236,7 @@ RandomX_ConfigurationBase::RandomX_ConfigurationBase()
 			memcpy(codePrefetchScratchpadTweaked, a, b - a);
 			codePrefetchScratchpadTweakedSize = b - a;
 		}
-#		if defined(APP_DEBUG) || defined(_MSC_VER)
+#		if defined(APP_DEBUG)
 		std::cout << (xmrig::Cpu::info()->hasBMI2() ? "+" : "-") << "BMI2\n";
 		std::cout << "sPST(-BMI2):" << std::dec << (b - a) << "\n";
 		std::cout << "sPST(+BMI2):" << std::dec << (c - b) << "\n";
@@ -247,7 +247,7 @@ RandomX_ConfigurationBase::RandomX_ConfigurationBase()
 		const uint8_t* b = addr(randomx_program_read_dataset_ryzen);
 		memcpy(codeReadDatasetTweaked, a, b - a);
 		codeReadDatasetTweakedSize = b - a;
-#		if defined(APP_DEBUG) || defined(_MSC_VER)
+#		if defined(APP_DEBUG)
 		std::cout << "sRDT   :" << std::dec << (b - a) << "\n";
 #		endif
 	}
@@ -256,7 +256,7 @@ RandomX_ConfigurationBase::RandomX_ConfigurationBase()
 		const uint8_t* b = addr(randomx_program_read_dataset_sshash_init);
 		memcpy(codeReadDatasetRyzenTweaked, a, b - a);
 		codeReadDatasetRyzenTweakedSize = b - a;
-#		if defined(APP_DEBUG) || defined(_MSC_VER)
+#		if defined(APP_DEBUG)
 		std::cout << "sRDRT  :" << std::dec << (b - a) << "\n";
 #		endif
 	}
@@ -264,7 +264,7 @@ RandomX_ConfigurationBase::RandomX_ConfigurationBase()
 		const uint8_t* a = addr(randomx_sshash_prefetch);
 		const uint8_t* b = addr(randomx_sshash_end);
 		memcpy(codeSshPrefetchTweaked, a, b - a);
-#		if defined(APP_DEBUG) || defined(_MSC_VER)
+#		if defined(APP_DEBUG)
 		std::cout << "sSPT   :" << std::dec << (b - a) << "\n";
 #		endif
 	}
@@ -298,7 +298,7 @@ void RandomX_ConfigurationBase::Apply()
 	DatasetBaseMask_Calculated = DatasetBaseSize - RANDOMX_DATASET_ITEM_SIZE;
 
 #if defined(XMRIG_FEATURE_ASM) && (defined(_M_X64) || defined(__x86_64__))
-#	if defined(APP_DEBUG) || defined(_MSC_VER)
+#	if defined(APP_DEBUG)
 	std::cout << "\n";
 	std::cout << "aRDT:0x" << std::hex << (uint64_t)codeReadDatasetTweaked << "\n";
 	std::cout << "o4: 0x" << std::hex << ((uint32_t*)(codeReadDatasetTweaked +  4))[0] << "\n";
@@ -354,7 +354,7 @@ void RandomX_ConfigurationBase::Apply()
 		}
 	}
 
-#	if defined(APP_DEBUG) || defined(_MSC_VER)
+#	if defined(APP_DEBUG)
 	std::cout << "\n";
 	std::cout << "aRDT:0x" << std::hex << (uint64_t)codeReadDatasetTweaked << "\n";
 	std::cout << "o4: 0x" << std::hex << ((uint32_t*)(codeReadDatasetTweaked +  4))[0] << "\n";
