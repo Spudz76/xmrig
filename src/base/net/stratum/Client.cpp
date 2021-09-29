@@ -178,8 +178,9 @@ int64_t xmrig::Client::send(const rapidjson::Value &obj)
 
 int64_t xmrig::Client::submit(const JobResult &result)
 {
+#   ifdef XMRIG_FEATURE_MO_BENCHMARK
     if (m_rpcId.isNull()) return 0; // ignore leftout benchmark jobs
-
+#   endif
 #   ifndef XMRIG_PROXY_PROJECT
     if (result.clientId != m_rpcId || m_rpcId.isNull() || m_state != ConnectedState) {
         return -1;

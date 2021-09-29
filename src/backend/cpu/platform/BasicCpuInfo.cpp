@@ -372,6 +372,7 @@ xmrig::CpuThreads xmrig::BasicCpuInfo::threads(const Algorithm &algorithm, uint3
             return count_limit;
         }
 
+#       ifdef XMRIG_ALGO_RX_XLA
         if (algorithm == Algorithm::RX_XLA) {
             CpuThreads threads;
             for (size_t i = 0; i < count_limit2; ++i) {
@@ -379,6 +380,7 @@ xmrig::CpuThreads xmrig::BasicCpuInfo::threads(const Algorithm &algorithm, uint3
             }
             return threads;
         }
+#       endif
 
         return count_limit2;
     }

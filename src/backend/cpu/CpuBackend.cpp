@@ -262,7 +262,11 @@ bool xmrig::CpuBackend::isEnabled() const
 
 bool xmrig::CpuBackend::isEnabled(const Algorithm &algorithm) const
 {
+#   ifdef XMRIG_FEATURE_MO_BENCHMARK
     return algorithm.isValid() && !d_ptr->controller->config()->cpu().threads().get(algorithm).isEmpty();
+#   else
+    return !d_ptr->controller->config()->cpu().threads().get(algorithm).isEmpty();
+#   endif
 }
 
 

@@ -316,7 +316,11 @@ void xmrig::CpuWorker<N>::start()
                     if (job.hasMinerSignature()) {
                         job.generateMinerSignature(m_job.blob(), job.size(), miner_signature_ptr);
                     }
+#                   ifdef XMRIG_ALGO_RX_XLA
                     randomx_calculate_hash_first(m_vm, tempHash, m_job.blob(), job.size(), job.algorithm());
+#                   else
+                    randomx_calculate_hash_first(m_vm, tempHash, m_job.blob(), job.size());
+#                   endif
 
                     if (RandomX_CurrentConfig.Tweak_V2_COMMITMENT) {
                         prev_job_size = job.size();
@@ -333,7 +337,11 @@ void xmrig::CpuWorker<N>::start()
                     job.generateMinerSignature(m_job.blob(), job.size(), miner_signature_ptr);
                 }
 
+#               ifdef XMRIG_ALGO_RX_XLA
                 randomx_calculate_hash_next(m_vm, tempHash, m_job.blob(), job.size(), m_hash, job.algorithm());
+#               else
+                randomx_calculate_hash_next(m_vm, tempHash, m_job.blob(), job.size(), m_hash);
+#               endif
 
                 if (RandomX_CurrentConfig.Tweak_V2_COMMITMENT) {
                     memcpy(m_commitment, m_hash, RANDOMX_HASH_SIZE);

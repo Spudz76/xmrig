@@ -128,9 +128,11 @@ xmrig::String xmrig::Threads<T>::profileName(const Algorithm &algorithm, bool st
         }
     }
 
+#   ifdef XMRIG_ALGO_RX_XLA
     if (std::is_same<T, CpuThreads>::value && (name == Algorithm::kRX_XLA) && has(Algorithm::kRX)) {
         return Algorithm::kRX;
     }
+#   endif
 
     if (has(kAsterisk)) {
         return kAsterisk;

@@ -152,9 +152,11 @@ size_t inline generate<Algorithm::RANDOM_X>(Threads<CpuThreads> &threads, uint32
         count += threads.move(Algorithm::kRX_WOW, std::move(wow));
     }
 
+#   ifdef XMRIG_ALGO_RX_XLA
     if (!threads.isExist(Algorithm::RX_XLA)) {
         count += generate(Algorithm::kRX_XLA, threads, Algorithm::RX_XLA, limit);
     }
+#   endif
 
     count += generate(Algorithm::kRX, threads, Algorithm::RX_0, limit);
 

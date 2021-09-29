@@ -66,7 +66,9 @@ class MoBenchmark : public IJobResultListener {
             Algorithm::RX_0,
             Algorithm::RX_GRAFT,
             Algorithm::RX_ARQ,
+#           ifdef XMRIG_ALGO_RX_XLA
             Algorithm::RX_XLA,
+#           endif
 #           endif
             Algorithm::INVALID
         };
