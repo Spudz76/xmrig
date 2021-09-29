@@ -1,6 +1,10 @@
 if (WITH_RANDOMX)
     add_definitions(/DXMRIG_ALGO_RANDOMX)
-    set(WITH_ARGON2 ON)
+    message("-- WITH_RANDOMX=ON (entire family: rx/0 rx/arq rx/graft rx/keva rx/sfx)")
+    if (NOT WITH_ARGON2)
+        message("-- WITH_RANDOMX=ON but WITH_ARGON2=OFF... forcing ON")
+        set(WITH_ARGON2 ON)
+    endif()
 
     list(APPEND HEADERS_CRYPTO
         src/crypto/rx/Rx.h
@@ -40,11 +44,6 @@ if (WITH_RANDOMX)
         src/crypto/rx/RxDataset.cpp
         src/crypto/rx/RxQueue.cpp
         src/crypto/rx/RxVm.cpp
-        src/crypto/randomx/panthera/sha256.c
-        src/crypto/randomx/panthera/KangarooTwelve.c
-        src/crypto/randomx/panthera/KeccakP-1600-reference.c
-        src/crypto/randomx/panthera/KeccakSpongeWidth1600.c
-        src/crypto/randomx/panthera/yespower-opt.c
     )
 
     if (WITH_RX_YADA)
@@ -53,6 +52,22 @@ if (WITH_RANDOMX)
     else()
         remove_definitions(/DXMRIG_ALGO_RX_YADA)
         message("-- WITH_RX_YADA=OFF (YADACoin algorithm)")
+    endif()
+
+    if (WITH_RX_XLA)
+        add_definitions(/DXMRIG_ALGO_RX_XLA)
+        message("-- WITH_RX_XLA=ON (panthera algorithm)")
+
+        list(APPEND SOURCES_CRYPTO
+            src/crypto/randomx/panthera/sha256.c
+            src/crypto/randomx/panthera/KangarooTwelve.c
+            src/crypto/randomx/panthera/KeccakP-1600-reference.c
+            src/crypto/randomx/panthera/KeccakSpongeWidth1600.c
+            src/crypto/randomx/panthera/yespower-opt.c
+        )
+    else()
+        remove_definitions(/DXMRIG_ALGO_RX_XLA)
+        message("-- WITH_RX_XLA=OFF (panthera algorithm)")
     endif()
 
     if (WITH_ASM AND CMAKE_C_COMPILER_ID MATCHES MSVC)
@@ -158,6 +173,7 @@ if (WITH_RANDOMX)
     endif()
 else()
     remove_definitions(/DXMRIG_ALGO_RANDOMX)
+    message("-- WITH_RANDOMX=OFF")
     if (WITH_RX_YADA)
         message("-- WITH_RANDOMX=OFF but WITH_RX_YADA=ON... forcing OFF")
         set(WITH_RX_YADA OFF)
@@ -165,5 +181,13 @@ else()
     # intentionally not an `else` in case above negated it
     if (NOT WITH_RX_YADA)
         remove_definitions(/DXMRIG_ALGO_RX_YADA)
+    endif()
+    if (WITH_RX_XLA)
+        message("-- WITH_RANDOMX=OFF but WITH_RX_XLA=ON... forcing OFF")
+        set(WITH_RX_XLA OFF)
+    endif()
+    # intentionally not an `else` in case above negated it
+    if (NOT WITH_RX_XLA)
+        remove_definitions(/DXMRIG_ALGO_RX_XLA)
     endif()
 endif()

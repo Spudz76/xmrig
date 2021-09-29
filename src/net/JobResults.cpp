@@ -133,7 +133,11 @@ static void getResults(JobBundle &bundle, std::vector<JobResult> &results, uint3
         for (uint32_t nonce : bundle.nonces) {
             *bundle.job.nonce() = nonce;
 
+#           ifdef XMRIG_ALGO_RX_XLA
             randomx_calculate_hash(vm, bundle.job.blob(), bundle.job.size(), hash, algorithm);
+#           else
+            randomx_calculate_hash(vm, bundle.job.blob(), bundle.job.size(), hash);
+#           endif
 
             checkHash(bundle, results, nonce, hash, errors);
         }
@@ -317,7 +321,11 @@ void xmrig::JobResults::done(const Job &job)
 
 void xmrig::JobResults::setListener(IJobResultListener *listener, bool hwAES)
 {
+#   ifdef XMRIG_FEATURE_MO_BENCHMARK
     if (handler) delete handler;
+#   else
+    assert(handler == nullptr);
+#   endif
 
     handler = new JobResultsPrivate(listener, hwAES);
 }

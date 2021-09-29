@@ -360,7 +360,9 @@ void xmrig::HwlocCpuInfo::processTopLevelCache(hwloc_obj_t cache, const Algorith
     if (extra == 0 && algorithm.l2() > 0) {
         cacheHashes = std::min<size_t>(std::max<size_t>(L2 / algorithm.l2(), cores.size()), cacheHashes);
     }
+#   ifdef XMRIG_ALGO_RX_XLA
     if (algorithm == Algorithm::RX_XLA) cacheHashes = cores.size();
+#   endif
 
 #   endif
 

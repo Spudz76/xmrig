@@ -50,10 +50,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #endif
 
+#ifdef XMRIG_ALGO_RX_XLA
 extern "C" {
 #include "crypto/randomx/panthera/yespower.h"
 #include "crypto/randomx/panthera/KangarooTwelve.h"
 }
+#endif
 
 #include "crypto/rx/Profiler.h"
 
@@ -134,7 +136,8 @@ RandomX_ConfigurationYada::RandomX_ConfigurationYada()
 }
 #endif
 
-RandomX_ConfigurationScala2::RandomX_ConfigurationScala2()
+#ifdef XMRIG_ALGO_RX_XLA
+RandomX_ConfigurationScala::RandomX_ConfigurationScala()
 {
 	ArgonMemory       = 131072;
 	ArgonIterations   = 2;
@@ -151,6 +154,7 @@ RandomX_ConfigurationScala2::RandomX_ConfigurationScala2()
 	RANDOMX_FREQ_IADD_RS = 25;
 	RANDOMX_FREQ_CBRANCH = 16;
 }
+#endif
 
 RandomX_ConfigurationBase::RandomX_ConfigurationBase()
 	: ArgonMemory(262144)
@@ -490,12 +494,15 @@ RandomX_ConfigurationKeva RandomX_KevaConfig;
 #ifdef XMRIG_ALGO_RX_YADA
 RandomX_ConfigurationYada RandomX_YadaConfig;
 #endif
-RandomX_ConfigurationScala2 RandomX_Scala2Config;
+#ifdef XMRIG_ALGO_RX_XLA
+RandomX_ConfigurationScala RandomX_ScalaConfig;
+#endif
 
 alignas(64) RandomX_ConfigurationBase RandomX_CurrentConfig;
 
 static std::mutex vm_pool_mutex;
 
+#ifdef XMRIG_ALGO_RX_XLA
 int rx_yespower_k12(void *out, size_t outlen, const void *in, size_t inlen)
 {
 	rx_blake2b_wrapper::run(out, outlen, in, inlen);
@@ -503,6 +510,7 @@ int rx_yespower_k12(void *out, size_t outlen, const void *in, size_t inlen)
 	if (yespower_tls((const uint8_t *)out, outlen, &params, (yespower_binary_t *)out)) return -1;
 	return KangarooTwelve((const unsigned char *)out, outlen, (unsigned char *)out, 32, 0, 0);
 }
+#endif
 
 extern "C" {
 
@@ -705,15 +713,23 @@ extern "C" {
 		vm->~randomx_vm();
 	}
 
+#	ifdef XMRIG_ALGO_RX_XLA
 	void randomx_calculate_hash(randomx_vm *machine, const void *input, size_t inputSize, void *output, const xmrig::Algorithm algo) {
+#	else
+	void randomx_calculate_hash(randomx_vm *machine, const void *input, size_t inputSize, void *output) {
+#	endif
 		assert(machine != nullptr);
 		assert(inputSize == 0 || input != nullptr);
 		assert(output != nullptr);
 		alignas(16) uint64_t tempHash[8];
+#		ifdef XMRIG_ALGO_RX_XLA
 		switch (algo) {
 		    case xmrig::Algorithm::RX_XLA: rx_yespower_k12(tempHash, sizeof(tempHash), input, inputSize); break;
 		    default: rx_blake2b_wrapper::run(tempHash, sizeof(tempHash), input, inputSize);
 		}
+#		else
+		rx_blake2b_wrapper::run(tempHash, sizeof(tempHash), input, inputSize);
+#		endif
 		machine->initScratchpad(&tempHash);
 		machine->resetRoundingMode();
 		for (uint32_t chain = 0; chain < RandomX_CurrentConfig.ProgramCount - 1; ++chain) {
@@ -724,15 +740,27 @@ extern "C" {
 		machine->getFinalResult(output);
 	}
 
+#	ifdef XMRIG_ALGO_RX_XLA
 	void randomx_calculate_hash_first(randomx_vm* machine, uint64_t (&tempHash)[8], const void* input, size_t inputSize, const xmrig::Algorithm algo) {
+#	else
+	void randomx_calculate_hash_first(randomx_vm* machine, uint64_t (&tempHash)[8], const void* input, size_t inputSize) {
+#	endif
+#		ifdef XMRIG_ALGO_RX_XLA
 		switch (algo) {
 		    case xmrig::Algorithm::RX_XLA: rx_yespower_k12(tempHash, sizeof(tempHash), input, inputSize); break;
 		    default: rx_blake2b_wrapper::run(tempHash, sizeof(tempHash), input, inputSize);
 		}
+#		else
+		rx_blake2b_wrapper::run(tempHash, sizeof(tempHash), input, inputSize);
+#		endif
 		machine->initScratchpad(tempHash);
 	}
 
+#	ifdef XMRIG_ALGO_RX_XLA
 	void randomx_calculate_hash_next(randomx_vm* machine, uint64_t (&tempHash)[8], const void* nextInput, size_t nextInputSize, void* output, const xmrig::Algorithm algo) {
+#	else
+	void randomx_calculate_hash_next(randomx_vm* machine, uint64_t (&tempHash)[8], const void* nextInput, size_t nextInputSize, void* output) {
+#	endif
 		PROFILE_SCOPE(RandomX_hash);
 
 		machine->resetRoundingMode();
@@ -743,10 +771,14 @@ extern "C" {
 		machine->run(&tempHash);
 
 		// Finish current hash and fill the scratchpad for the next hash at the same time
+#		ifdef XMRIG_ALGO_RX_XLA
 		switch (algo) {
 		    case xmrig::Algorithm::RX_XLA: rx_yespower_k12(tempHash, sizeof(tempHash), nextInput, nextInputSize); break;
 		    default: rx_blake2b_wrapper::run(tempHash, sizeof(tempHash), nextInput, nextInputSize);
 		}
+#		else
+		rx_blake2b_wrapper::run(tempHash, sizeof(tempHash), nextInput, nextInputSize);
+#		endif
 		machine->hashAndFill(output, tempHash);
 	}
 

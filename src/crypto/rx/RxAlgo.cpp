@@ -53,8 +53,10 @@ const RandomX_ConfigurationBase *xmrig::RxAlgo::base(Algorithm::Id algorithm)
         return &RandomX_YadaConfig;
 #   endif
 
+#   ifdef XMRIG_ALGO_RX_XLA
     case Algorithm::RX_XLA:
-        return &RandomX_Scala2Config;
+        return &RandomX_ScalaConfig;
+#   endif
 
     default:
         break;

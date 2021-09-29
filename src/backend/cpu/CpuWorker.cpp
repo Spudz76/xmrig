@@ -309,7 +309,11 @@ void xmrig::CpuWorker<N>::start()
                     if (job.hasMinerSignature()) {
                         job.generateMinerSignature(m_job.blob(), job.size(), miner_signature_ptr);
                     }
+#                   ifdef XMRIG_ALGO_RX_XLA
                     randomx_calculate_hash_first(m_vm, tempHash, m_job.blob(), job.size(), job.algorithm());
+#                   else
+                    randomx_calculate_hash_first(m_vm, tempHash, m_job.blob(), job.size());
+#                   endif
                 }
 
                 if (!nextRound()) {
@@ -320,7 +324,11 @@ void xmrig::CpuWorker<N>::start()
                     memcpy(miner_signature_saved, miner_signature_ptr, sizeof(miner_signature_saved));
                     job.generateMinerSignature(m_job.blob(), job.size(), miner_signature_ptr);
                 }
+#               ifdef XMRIG_ALGO_RX_XLA
                 randomx_calculate_hash_next(m_vm, tempHash, m_job.blob(), job.size(), m_hash, job.algorithm());
+#               else
+                randomx_calculate_hash_next(m_vm, tempHash, m_job.blob(), job.size(), m_hash);
+#               endif
             }
             else
 #           endif
