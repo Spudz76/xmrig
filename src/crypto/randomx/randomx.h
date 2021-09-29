@@ -32,7 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
+#ifdef XMRIG_ALGO_RX_XLA
 #include "base/crypto/Algorithm.h"
+#endif
 #include "crypto/randomx/intrin_portable.h"
 
 #define RANDOMX_HASH_SIZE 32
@@ -166,7 +168,9 @@ struct RandomX_ConfigurationKeva : public RandomX_ConfigurationBase { RandomX_Co
 #ifdef XMRIG_ALGO_RX_YADA
 struct RandomX_ConfigurationYada : public RandomX_ConfigurationBase { RandomX_ConfigurationYada(); };
 #endif
-struct RandomX_ConfigurationScala2 : public RandomX_ConfigurationBase { RandomX_ConfigurationScala2(); };
+#ifdef XMRIG_ALGO_RX_XLA
+struct RandomX_ConfigurationScala : public RandomX_ConfigurationBase { RandomX_ConfigurationScala(); };
+#endif
 
 extern RandomX_ConfigurationMonero RandomX_MoneroConfig;
 extern RandomX_ConfigurationWownero RandomX_WowneroConfig;
@@ -178,7 +182,9 @@ extern RandomX_ConfigurationKeva RandomX_KevaConfig;
 #ifdef XMRIG_ALGO_RX_YADA
 extern RandomX_ConfigurationYada RandomX_YadaConfig;
 #endif
-extern RandomX_ConfigurationScala2 RandomX_Scala2Config;
+#ifdef XMRIG_ALGO_RX_XLA
+extern RandomX_ConfigurationScala RandomX_ScalaConfig;
+#endif
 
 extern RandomX_ConfigurationBase RandomX_CurrentConfig;
 
@@ -337,10 +343,17 @@ RANDOMX_EXPORT void randomx_destroy_vm(randomx_vm *machine);
  * @param output is a pointer to memory where the hash will be stored. Must not
  *        be NULL and at least RANDOMX_HASH_SIZE bytes must be available for writing.
 */
+#if defined(XMRIG_ALGO_RX_XLA)
 RANDOMX_EXPORT void randomx_calculate_hash(randomx_vm *machine, const void *input, size_t inputSize, void *output, const xmrig::Algorithm algo);
 
 RANDOMX_EXPORT void randomx_calculate_hash_first(randomx_vm* machine, uint64_t (&tempHash)[8], const void* input, size_t inputSize, const xmrig::Algorithm algo);
 RANDOMX_EXPORT void randomx_calculate_hash_next(randomx_vm* machine, uint64_t (&tempHash)[8], const void* nextInput, size_t nextInputSize, void* output, const xmrig::Algorithm algo);
+#else
+RANDOMX_EXPORT void randomx_calculate_hash(randomx_vm *machine, const void *input, size_t inputSize, void *output);
+
+RANDOMX_EXPORT void randomx_calculate_hash_first(randomx_vm* machine, uint64_t (&tempHash)[8], const void* input, size_t inputSize);
+RANDOMX_EXPORT void randomx_calculate_hash_next(randomx_vm* machine, uint64_t (&tempHash)[8], const void* nextInput, size_t nextInputSize, void* output);
+#endif
 
 #if defined(__cplusplus)
 }
