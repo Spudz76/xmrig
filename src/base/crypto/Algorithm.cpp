@@ -90,6 +90,9 @@ const char *Algorithm::kRX_KEVA         = "rx/keva";
 #ifdef XMRIG_ALGO_RX_YADA
 const char *Algorithm::kRX_YADA         = "rx/yada";
 #endif
+#ifdef XMRIG_ALGO_RX_XLA
+const char *Algorithm::kRX_XLA          = "panthera";
+#endif
 #endif
 
 #ifdef XMRIG_ALGO_ARGON2
@@ -109,10 +112,6 @@ const char* Algorithm::kGHOSTRIDER      = "ghostrider";
 const char* Algorithm::kGHOSTRIDER_RTM  = "ghostrider";
 const char* Algorithm::kFLEX            = "flex";
 const char* Algorithm::kFLEX_KCN        = "flex";
-#endif
-
-#ifdef XMRIG_ALGO_RANDOMX
-const char *Algorithm::kRX_XLA          = "panthera";
 #endif
 
 
@@ -170,6 +169,9 @@ static const std::map<uint32_t, const char *> kAlgorithmNames = {
 #   ifdef XMRIG_ALGO_RX_YADA
     ALGO_NAME(RX_YADA),
 #   endif
+#   ifdef XMRIG_ALGO_RX_XLA
+    ALGO_NAME(RX_XLA),
+#   endif
 #   endif
 
 #   ifdef XMRIG_ALGO_ARGON2
@@ -180,10 +182,6 @@ static const std::map<uint32_t, const char *> kAlgorithmNames = {
 
 #   ifdef XMRIG_ALGO_KAWPOW
     ALGO_NAME(KAWPOW_RVN),
-#   endif
-
-#   ifdef XMRIG_ALGO_RANDOMX
-    ALGO_NAME(RX_XLA),
 #   endif
 
 #   ifdef XMRIG_ALGO_GHOSTRIDER
@@ -301,6 +299,9 @@ static const std::map<const char *, Algorithm::Id, aliasCompare> kAlgorithmAlias
     ALGO_ALIAS_AUTO(RX_YADA),       ALGO_ALIAS(RX_YADA,         "randomx/yada"),
                                     ALGO_ALIAS(RX_YADA,         "randomyada"),
 #   endif
+#   ifdef XMRIG_ALGO_RX_XLA
+    ALGO_ALIAS_AUTO(RX_XLA),        ALGO_ALIAS(RX_XLA,          "Panthera"),
+#   endif
 #   endif
 
 #   ifdef XMRIG_ALGO_ARGON2
@@ -311,10 +312,6 @@ static const std::map<const char *, Algorithm::Id, aliasCompare> kAlgorithmAlias
 
 #   ifdef XMRIG_ALGO_KAWPOW
     ALGO_ALIAS_AUTO(KAWPOW_RVN),    ALGO_ALIAS(KAWPOW_RVN,      "kawpow/rvn"),
-#   endif
-
-#   ifdef XMRIG_ALGO_RANDOMX
-    ALGO_ALIAS_AUTO(RX_XLA),        ALGO_ALIAS(RX_XLA,          "Panthera"),
 #   endif
 
 #   ifdef XMRIG_ALGO_GHOSTRIDER
@@ -397,11 +394,15 @@ std::vector<xmrig::Algorithm> xmrig::Algorithm::all(const std::function<bool(con
 #       ifdef XMRIG_ALGO_CN_GPU
         CN_GPU,
 #       endif
+#       ifdef XMRIG_ALGO_RANDOMX
         RX_0, RX_WOW, RX_ARQ, RX_XEQ, RX_GRAFT, RX_SFX, RX_KEVA,
 #       ifdef XMRIG_ALGO_RX_YADA
         RX_YADA,
 #       endif
+#       ifdef XMRIG_ALGO_RX_XLA
         RX_XLA,
+#       endif
+#       endif
         AR2_CHUKWA, AR2_CHUKWA_V2, AR2_WRKZ,
         KAWPOW_RVN,
         GHOSTRIDER_RTM,
