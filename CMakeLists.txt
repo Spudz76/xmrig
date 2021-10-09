@@ -32,6 +32,7 @@ option(WITH_VAES            "Enable VAES instructions for Cryptonight" ON)
 option(WITH_BENCHMARK       "Enable builtin RandomX benchmark and stress test" ON)
 option(WITH_SECURE_JIT      "Enable secure access to JIT memory" OFF)
 option(WITH_DMI             "Enable DMI/SMBIOS reader" ON)
+option(WITH_PAUSE_PROCESS   "Enable Pause-on-Process feature" ON)
 
 option(BUILD_STATIC         "Build static binary" OFF)
 option(ARM_V8               "Force ARMv8 (64 bit) architecture, use with caution if automatic detection fails, but you sure it may work" OFF)
@@ -163,6 +164,9 @@ if (XMRIG_OS_WIN)
         )
 
     set(EXTRA_LIBS ws2_32 psapi iphlpapi userenv)
+    if (WITH_PAUSE_PROCESS)
+        list(APPEND EXTRA_LIBS shlwapi)
+    endif()
 elseif (XMRIG_OS_APPLE)
     list(APPEND SOURCES_OS
         src/App_unix.cpp
@@ -187,6 +191,14 @@ else()
             )
 
         set(EXTRA_LIBS pthread rt dl)
+        if ((WITH_PAUSE_PROCESS) AND
+            ((CMAKE_CXX_COMPILER_ID MATCHES Clang) OR
+             ((CMAKE_CXX_COMPILER_ID MATCHES GNU) AND
+             (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS "9.0.0"))
+            )
+        )
+            list(APPEND EXTRA_LIBS stdc++fs)
+        endif()
     elseif (XMRIG_OS_FREEBSD)
         set(EXTRA_LIBS kvm pthread)
     endif()
