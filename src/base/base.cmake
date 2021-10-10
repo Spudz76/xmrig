@@ -274,3 +274,10 @@ if (WITH_RANDOMX AND WITH_BENCHMARK)
 else()
     remove_definitions(/DXMRIG_FEATURE_BENCHMARK)
 endif()
+
+
+if (WITH_PAUSE_PROCESS)
+    add_definitions(/DXMRIG_FEATURE_PAUSE_PROCESS)
+else()
+    remove_definitions(/DXMRIG_FEATURE_PAUSE_PROCESS)
+endif()
