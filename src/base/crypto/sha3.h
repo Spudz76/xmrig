@@ -68,6 +68,6 @@ extern "C"
 sha3_return_t sha3_HashBuffer(
     unsigned bitSize,   /* 256, 384, 512 */
     enum SHA3_FLAGS flags, /* SHA3_FLAGS_NONE or SHA3_FLAGS_KECCAK */
-    const void *in, unsigned inBytes,
+    const void *in, size_t inBytes,
     void *out, unsigned outBytes );     /* up to bitSize/8; truncation OK */
 #endif

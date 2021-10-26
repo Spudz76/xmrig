@@ -312,7 +312,7 @@ namespace randomx {
 		}
 		memcpy(code + epilogueOffset, codeEpilogue, epilogueSize);
 
-		codePosFirst = prologueSize + (hasXOP ? loopLoadXOPSize : loopLoadSize);
+		codePosFirst = static_cast<uint32_t>(prologueSize + (hasXOP ? loopLoadXOPSize : loopLoadSize));
 
 #		ifdef XMRIG_FIX_RYZEN
 		mainLoopBounds.first = code + prologueSize;
@@ -423,7 +423,7 @@ namespace randomx {
 		}
 
 		memcpy(code + superScalarHashOffset, codeSshInit, codeSshInitSize);
-		codePos = superScalarHashOffset + codeSshInitSize;
+		codePos = static_cast<uint32_t>(superScalarHashOffset + codeSshInitSize);
 		for (unsigned j = 0; j < RandomX_CurrentConfig.CacheAccesses; ++j) {
 			SuperscalarProgram& prog = programs[j];
 			uint32_t pos = codePos;
@@ -452,7 +452,7 @@ namespace randomx {
 	}
 
 	void JitCompilerX86::generateProgramPrologue(Program& prog, ProgramConfiguration& pcfg) {
-		codePos = ADDR(randomx_program_prologue_first_load) - ADDR(randomx_program_prologue);
+		codePos = static_cast<uint32_t>(ADDR(randomx_program_prologue_first_load) - ADDR(randomx_program_prologue));
 
 		if (RandomX_CurrentConfig.Tweak_V2_AES && !hasAES) {
 			*(uint64_t*)(code + codePos + 9) = reinterpret_cast<uint64_t>(lutEnc);
@@ -516,16 +516,16 @@ namespace randomx {
 		if (RandomX_CurrentConfig.Tweak_V2_AES) {
 			if (hasAES) {
 				memcpy(code + codePos, codeLoopStoreHardAES, loopStoreHardAESSize);
-				codePos += loopStoreHardAESSize;
+				codePos += static_cast<uint32_t>(loopStoreHardAESSize);
 			}
 			else {
 				memcpy(code + codePos, codeLoopStoreSoftAES, loopStoreSoftAESSize);
-				codePos += loopStoreSoftAESSize;
+				codePos += static_cast<uint32_t>(loopStoreSoftAESSize);
 			}
 		}
 		else {
 			memcpy(code + codePos, codeLoopStore, loopStoreSize);
-			codePos += loopStoreSize;
+			codePos += static_cast<uint32_t>(loopStoreSize);
 		}
 
 		if (BranchesWithin32B) {
@@ -545,7 +545,7 @@ namespace randomx {
 
 		*(uint64_t*)(code + codePos) = 0x850f01eb83ull;
 		codePos += 5;
-		emit32(prologueSize - codePos - 4, code, codePos);
+		emit32(static_cast<uint32_t>(prologueSize - codePos - 4), code, codePos);
 		emitByte(0xe9, code, codePos);
 		emit32(epilogueOffset - codePos - 4, code, codePos);
 	}
@@ -936,12 +936,12 @@ namespace randomx {
 		const uint64_t dst = instr.dst;
 
 		if (src != dst) {
-			genAddressReg<true>(instr, src, p, pos);
+			genAddressReg<true>(instr, static_cast<const uint32_t>(src), p, pos);
 			*(uint64_t*)(p + pos) = 0x0604af0f4cull + (dst << 27);
 			pos += 5;
 		}
 		else {
-			emit32(0x86af0f4c + (dst << 27), p, pos);
+			emit32(static_cast<uint32_t>(0x86af0f4c + (dst << 27)), p, pos);
 			genAddressImm(instr, p, pos);
 		}
 
@@ -988,7 +988,7 @@ namespace randomx {
 		const uint64_t dst = instr.dst;
 
 		if (src != dst) {
-			genAddressReg<false>(instr, src, p, pos);
+			genAddressReg<false>(instr, static_cast<uint32_t>(src), p, pos);
 			*(uint64_t*)(p + pos) = 0x0e24f748c08b49ull + (dst << 16);
 			pos += 7;
 		}
@@ -997,7 +997,7 @@ namespace randomx {
 			pos += 6;
 			genAddressImm(instr, p, pos);
 		}
-		*(uint32_t*)(p + pos) = 0xc28b4c + (dst << 19);
+		*(uint32_t*)(p + pos) = static_cast<uint32_t>(0xc28b4c + (dst << 19));
 		pos += 3;
 
 		registerUsage[dst] = pos;
@@ -1012,7 +1012,7 @@ namespace randomx {
 		const uint64_t dst = instr.dst;
 
 		if (src != dst) {
-			genAddressReg<false>(instr, src, p, pos);
+			genAddressReg<false>(instr, static_cast<uint32_t>(src), p, pos);
 			*(uint32_t*)(p + pos) = static_cast<uint32_t>(0xC4D08B49 + (dst << 16));
 			*(uint64_t*)(p + pos + 4) = 0x0E04F6FB62ULL + (dst << 27);
 			pos += 9;
@@ -1036,7 +1036,7 @@ namespace randomx {
 
 		*(uint64_t*)(p + pos) = 0x8b4ce8f749c08b49ull + (dst << 16) + (src << 40);
 		pos += 8;
-		emitByte(0xc2 + 8 * dst, p, pos);
+		emitByte(static_cast<uint8_t>(0xc2 + 8 * dst), p, pos);
 
 		registerUsage[dst] = pos;
 		codePos = pos;
@@ -1050,7 +1050,7 @@ namespace randomx {
 		const uint64_t dst = instr.dst;
 
 		if (src != dst) {
-			genAddressReg<false>(instr, src, p, pos);
+			genAddressReg<false>(instr, static_cast<uint32_t>(src), p, pos);
 			*(uint64_t*)(p + pos) = 0x0e2cf748c08b49ull + (dst << 16);
 			pos += 7;
 		}
@@ -1059,7 +1059,7 @@ namespace randomx {
 			pos += 6;
 			genAddressImm(instr, p, pos);
 		}
-		*(uint32_t*)(p + pos) = 0xc28b4c + (dst << 19);
+		*(uint32_t*)(p + pos) = static_cast<uint32_t>(0xc28b4c + (dst << 19));
 		pos += 3;
 
 		registerUsage[dst] = pos;
@@ -1117,7 +1117,7 @@ namespace randomx {
 		const uint64_t dst = instr.dst;
 
 		if (src != dst) {
-			*(uint32_t*)(p + pos) = 0xc0334d + (((dst << 3) + src) << 16);
+			*(uint32_t*)(p + pos) = static_cast<uint32_t>(0xc0334d + (((dst << 3) + src) << 16));
 			pos += 3;
 		}
 		else {
@@ -1138,11 +1138,11 @@ namespace randomx {
 		const uint64_t dst = instr.dst;
 
 		if (src != dst) {
-			genAddressReg<true>(instr, src, p, pos);
-			emit32(0x0604334c + (dst << 19), p, pos);
+			genAddressReg<true>(instr, static_cast<uint32_t>(src), p, pos);
+			emit32(static_cast<uint32_t>(0x0604334c + (dst << 19)), p, pos);
 		}
 		else {
-			*(uint32_t*)(p + pos) = 0x86334c + (dst << 19);
+			*(uint32_t*)(p + pos) = static_cast<uint32_t>(0x86334c + (dst << 19));
 			pos += 3;
 			genAddressImm(instr, p, pos);
 		}
@@ -1163,7 +1163,7 @@ namespace randomx {
 			pos += 6;
 		}
 		else {
-			*(uint32_t*)(p + pos) = 0xc8c149 + (dst << 16);
+			*(uint32_t*)(p + pos) = static_cast<uint32_t>(0xc8c149 + (dst << 16));
 			pos += 3;
 			emitByte(instr.getImm32() & 63, p, pos);
 		}
@@ -1184,7 +1184,7 @@ namespace randomx {
 			pos += 6;
 		}
 		else {
-			*(uint32_t*)(p + pos) = 0xc0c149 + (dst << 16);
+			*(uint32_t*)(p + pos) = static_cast<uint32_t>(0xc0c149 + (dst << 16));
 			pos += 3;
 			emitByte(instr.getImm32() & 63, p, pos);
 		}
