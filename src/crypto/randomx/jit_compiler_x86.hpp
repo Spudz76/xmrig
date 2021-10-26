@@ -141,7 +141,7 @@ namespace randomx {
 
 		static void emit(const uint8_t* src, size_t count, uint8_t* code, uint32_t& codePos) {
 			memcpy(code + codePos, src, count);
-			codePos += count;
+			codePos += static_cast<uint32_t>(count);
 		}
 
 	public:

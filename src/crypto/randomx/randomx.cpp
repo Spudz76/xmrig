@@ -230,11 +230,11 @@ RandomX_ConfigurationBase::RandomX_ConfigurationBase()
 		const uint8_t* c = addr(randomx_prefetch_scratchpad_end);
 		if (xmrig::Cpu::info()->hasBMI2()) {
 			memcpy(codePrefetchScratchpadTweaked, b, c - b);
-			codePrefetchScratchpadTweakedSize = c - b;
+			codePrefetchScratchpadTweakedSize = static_cast<uint32_t>(c - b);
 		}
 		else {
 			memcpy(codePrefetchScratchpadTweaked, a, b - a);
-			codePrefetchScratchpadTweakedSize = b - a;
+			codePrefetchScratchpadTweakedSize = static_cast<uint32_t>(b - a);
 		}
 #		if defined(APP_DEBUG)
 		std::cout << (xmrig::Cpu::info()->hasBMI2() ? "+" : "-") << "BMI2\n";
@@ -246,7 +246,7 @@ RandomX_ConfigurationBase::RandomX_ConfigurationBase()
 		const uint8_t* a = addr(randomx_program_read_dataset);
 		const uint8_t* b = addr(randomx_program_read_dataset_ryzen);
 		memcpy(codeReadDatasetTweaked, a, b - a);
-		codeReadDatasetTweakedSize = b - a;
+		codeReadDatasetTweakedSize = static_cast<uint32_t>(b - a);
 #		if defined(APP_DEBUG)
 		std::cout << "sRDT   :" << std::dec << (b - a) << "\n";
 #		endif
@@ -255,7 +255,7 @@ RandomX_ConfigurationBase::RandomX_ConfigurationBase()
 		const uint8_t* a = addr(randomx_program_read_dataset_ryzen);
 		const uint8_t* b = addr(randomx_program_read_dataset_sshash_init);
 		memcpy(codeReadDatasetRyzenTweaked, a, b - a);
-		codeReadDatasetRyzenTweakedSize = b - a;
+		codeReadDatasetRyzenTweakedSize = static_cast<uint32_t>(b - a);
 #		if defined(APP_DEBUG)
 		std::cout << "sRDRT  :" << std::dec << (b - a) << "\n";
 #		endif
@@ -517,7 +517,7 @@ extern "C" {
 					UNREACHABLE;
 			}
 		}
-		catch (std::exception &ex) {
+		catch (std::exception &) {
 			if (cache != nullptr) {
 				randomx_release_cache(cache);
 				cache = nullptr;
@@ -658,8 +658,9 @@ extern "C" {
 			vm->setScratchpad(scratchpad);
 			vm->setFlags(flags);
 		}
-		catch (std::exception &ex) {
-			vm = nullptr;
+		catch (std::exception &) {
+			delete vm;
+			vm_size = 0;
 		}
 
 		if (vm) {
