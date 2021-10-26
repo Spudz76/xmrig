@@ -542,7 +542,7 @@ template<size_t N>
 void xmrig::CpuWorker<N>::allocateCnCtx()
 {
     if (m_ctx[0] == nullptr) {
-        int shift = 0;
+        size_t shift = 0;
 
 #       ifdef XMRIG_ALGO_CN_HEAVY
         // cn-heavy optimization for Zen3 CPUs
