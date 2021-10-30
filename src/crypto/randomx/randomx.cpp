@@ -289,7 +289,6 @@ void RandomX_ConfigurationBase::Apply()
 
 #if defined(XMRIG_FEATURE_ASM) && (defined(_M_X64) || defined(__x86_64__))
 	*(uint32_t*)(codeSshPrefetchTweaked + 3) = ArgonMemory * 16 - 1;
-	*(uint32_t*)(codeSshPrefetchTweaked + 3) = ArgonMemory * 16 - 1;
 	const uint32_t DatasetBaseMask = DatasetBaseSize - RANDOMX_DATASET_ITEM_SIZE;
 	*(uint32_t*)(codeReadDatasetV2Tweaked + 9) = DatasetBaseMask;
 	*(uint32_t*)(codeReadDatasetV2Tweaked + 24) = DatasetBaseMask;
