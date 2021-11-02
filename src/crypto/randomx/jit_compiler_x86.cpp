@@ -122,6 +122,7 @@ namespace randomx {
 	#define codeReadDatasetLightSshFin ADDR(randomx_program_read_dataset_sshash_fin)
 	#define codeDatasetInit ADDR(randomx_dataset_init)
 	#define codeDatasetInitAVX2Prologue ADDR(randomx_dataset_init_avx2_prologue)
+	#define codeDatasetInitAVX2LoopBegin ADDR(randomx_dataset_init_avx2_loop_begin)
 	#define codeDatasetInitAVX2LoopEnd ADDR(randomx_dataset_init_avx2_loop_end)
 	#define codeDatasetInitAVX2Epilogue ADDR(randomx_dataset_init_avx2_epilogue)
 	#define codeDatasetInitAVX2SshLoad ADDR(randomx_dataset_init_avx2_ssh_load)
@@ -148,7 +149,8 @@ namespace randomx {
 	#define loopStoreHardAESSize (codeLoopStoreSoftAES - codeLoopStoreHardAES)
 	#define loopStoreSoftAESSize (codeLoopEnd - codeLoopStoreSoftAES)
 	#define datasetInitSize (codeDatasetInitAVX2Prologue - codeDatasetInit)
-	#define datasetInitAVX2PrologueSize (codeDatasetInitAVX2LoopEnd - codeDatasetInitAVX2Prologue)
+	#define datasetInitAVX2PrologueSize (codeDatasetInitAVX2LoopBegin - codeDatasetInitAVX2Prologue)
+	#define datasetInitAVX2LoopBeginSize (codeDatasetInitAVX2LoopEnd - codeDatasetInitAVX2LoopBegin)
 	#define datasetInitAVX2LoopEndSize (codeDatasetInitAVX2Epilogue - codeDatasetInitAVX2LoopEnd)
 	#define datasetInitAVX2EpilogueSize (codeDatasetInitAVX2SshLoad - codeDatasetInitAVX2Epilogue)
 	#define datasetInitAVX2SshLoadSize (codeDatasetInitAVX2SshPrefetch - codeDatasetInitAVX2SshLoad)
@@ -369,12 +371,13 @@ namespace randomx {
 			codePos += n;
 		}
 
+		emit(RandomX_CurrentConfig.codeReadDatasetTweaked, readDatasetSize, code, codePos);
 		generateProgramEpilogue(prog, pcfg);
 	}
 
 	void JitCompilerX86::generateProgramLight(Program& prog, ProgramConfiguration& pcfg, uint32_t datasetOffset) {
 		generateProgramPrologue(prog, pcfg);
-		emit(codeReadDatasetLightSshInit, readDatasetLightInitSize, code, codePos);
+		emit(RandomX_CurrentConfig.codeReadDatasetLightSshInitTweaked, readDatasetLightInitSize, code, codePos);
 		*(uint32_t*)(code + codePos) = 0xc381;
 		codePos += 2;
 		emit32(datasetOffset / CacheLineSize, code, codePos);
@@ -389,7 +392,7 @@ namespace randomx {
 		uint8_t* p = code;
 		if (initDatasetAVX2) {
 			codePos = 0;
-			emit(codeDatasetInitAVX2Prologue, datasetInitAVX2PrologueSize, code, codePos);
+			emit(RandomX_CurrentConfig.codeDatasetInitAVX2PrologueTweaked, datasetInitAVX2PrologueSize, code, codePos);
 
 			for (unsigned j = 0; j < RandomX_CurrentConfig.CacheAccesses; ++j) {
 				SuperscalarProgram& prog = programs[j];
@@ -405,7 +408,7 @@ namespace randomx {
 					codePos += 3;
 					emit(RandomX_CurrentConfig.codeSshPrefetchTweaked, codeSshPrefetchSize, code, codePos);
 					uint8_t* p = code + codePos;
-					emit(codeDatasetInitAVX2SshPrefetch, datasetInitAVX2SshPrefetchSize, code, codePos);
+					emit(RandomX_CurrentConfig.codeDatasetInitAVX2SshPrefetchTweaked, datasetInitAVX2SshPrefetchSize, code, codePos);
 					p[3] += prog.getAddressRegister() << 3;
 				}
 			}
@@ -420,7 +423,7 @@ namespace randomx {
 			return;
 		}
 
-		memcpy(code + superScalarHashOffset, codeSshInit, codeSshInitSize);
+		memcpy(code + superScalarHashOffset, RandomX_CurrentConfig.codeSshInitTweaked, codeSshInitSize);
 		codePos = superScalarHashOffset + codeSshInitSize;
 		for (unsigned j = 0; j < RandomX_CurrentConfig.CacheAccesses; ++j) {
 			SuperscalarProgram& prog = programs[j];
@@ -450,6 +453,7 @@ namespace randomx {
 	}
 
 	void JitCompilerX86::generateProgramPrologue(Program& prog, ProgramConfiguration& pcfg) {
+		*(uint32_t*)(code + 32) = RandomX_CurrentConfig.DatasetBaseMask_Calculated;
 		codePos = ADDR(randomx_program_prologue_first_load) - ADDR(randomx_program_prologue);
 
 		if (RandomX_CurrentConfig.Tweak_V2_AES && !hasAES) {
