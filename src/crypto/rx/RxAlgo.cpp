@@ -44,8 +44,10 @@ const RandomX_ConfigurationBase *xmrig::RxAlgo::base(Algorithm::Id algorithm)
     case Algorithm::RX_SFX:
         return &RandomX_SafexConfig;
 
+#   ifdef XMRIG_ALGO_RX_YADA
     case Algorithm::RX_YADA:
         return &RandomX_YadaConfig;
+#   endif
 
     default:
         break;

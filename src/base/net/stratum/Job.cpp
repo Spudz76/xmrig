@@ -111,9 +111,11 @@ bool xmrig::Job::setSeedHash(const char *hash)
 bool xmrig::Job::setTarget(const char *target)
 {
     static auto parse = [](const char *target, size_t size, const Algorithm &algorithm) -> uint64_t {
+#   ifdef XMRIG_ALGO_RX_YADA
         if (algorithm == Algorithm::RX_YADA) {
             return strtoull(target, nullptr, 16);
         }
+#   endif
 
         const auto raw = Cvt::fromHex(target, size);
 
@@ -165,9 +167,11 @@ size_t xmrig::Job::nonceOffset() const
         break;
     }
 
+#   ifdef XMRIG_ALGO_RX_YADA
     if (algorithm() == Algorithm::RX_YADA) {
         return 147;
     }
+#   endif
 
     return 39;
 }
