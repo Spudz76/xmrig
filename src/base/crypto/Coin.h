@@ -36,11 +36,13 @@ public:
         SUMO,
         ARQMA,
         GRAFT,
+#       ifdef XMRIG_ALGO_RX_YADA
+        YADA,
+#       endif
         RAVEN,
         WOWNERO,
         ZEPHYR,
         TOWNFORGE,
-        YADA,
         MAX
     };
 

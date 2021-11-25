@@ -8,6 +8,7 @@
 * **`-DWITH_CN_PICO=OFF`** disable CryptoNight-Pico algorithm (`cn-pico`).
 * **`-DWITH_CN_GPU=OFF`** disable CryptoNight-GPU algorithm (`cn/gpu`).
 * **`-DWITH_RANDOMX=OFF`** disable RandomX algorithms (`rx/loki`, `rx/wow`).
+* **`-DWITH_RX_YADA=OFF`** disable RandomX YADACoin algorithm (`rx/yada`).
 * **`-DWITH_ARGON2=OFF`** disable Argon2 algorithms (`argon2/chukwa`, `argon2/wrkz`).
 
 ## Features
