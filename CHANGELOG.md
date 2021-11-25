@@ -1,3 +1,6 @@
+# not-merged
+- [#2411](https://github.com/xmrig/xmrig/pull/2411) Added support for Yada (`rx/yada` algorithm).
+
 # v6.21.3
 - [#3462](https://github.com/xmrig/xmrig/pull/3462) RandomX: correct memcpy size for JIT initialization.
 

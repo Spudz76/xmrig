@@ -119,6 +119,12 @@ bool xmrig::Job::setTarget(const char *target)
     const auto raw    = Cvt::fromHex(target, strlen(target));
     const size_t size = raw.size();
 
+#   ifdef XMRIG_ALGO_RX_YADA
+    if (algorithm() == Algorithm::RX_YADA) {
+        m_target = strtoull(target, nullptr, 16);
+    }
+    else
+#   endif
     if (size == 4) {
         m_target = 0xFFFFFFFFFFFFFFFFULL / (0xFFFFFFFFULL / uint64_t(*reinterpret_cast<const uint32_t *>(raw.data())));
     }
@@ -176,6 +182,10 @@ int32_t xmrig::Job::nonceOffset() const
    auto f = algorithm().family();
    if (f == Algorithm::KAWPOW)     return 32;
    if (f == Algorithm::GHOSTRIDER) return 76;
+#  ifdef XMRIG_ALGO_RX_YADA
+   auto id = algorithm().id();
+   if (id == Algorithm::RX_YADA)   return 147;
+#  endif
    return 39;
 }
 

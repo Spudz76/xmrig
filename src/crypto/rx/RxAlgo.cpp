@@ -47,6 +47,11 @@ const RandomX_ConfigurationBase *xmrig::RxAlgo::base(Algorithm::Id algorithm)
     case Algorithm::RX_KEVA:
         return &RandomX_KevaConfig;
 
+#   ifdef XMRIG_ALGO_RX_YADA
+    case Algorithm::RX_YADA:
+        return &RandomX_YadaConfig;
+#   endif
+
     default:
         break;
     }

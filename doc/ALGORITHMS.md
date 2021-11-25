@@ -12,6 +12,7 @@ Option `coin` useful for pools without [algorithm negotiation](https://xmrig.com
 
 | Name | Memory | Version | Description | Notes |
 |------|--------|---------|-------------|-------|
+| `rx/yada` | 2 MB | 6.17.0+ | RandomYADA (RandomX variant for Yada). |  |
 | `kawpow` | - | 6.0.0+ | KawPow (Ravencoin) | GPU only |
 | `rx/keva` | 1 MB | 5.9.0+ | RandomKEVA (RandomX variant for Keva). |  |
 | `astrobwt` | 20 MB | 5.8.0+ | AstroBWT (Dero). |  |

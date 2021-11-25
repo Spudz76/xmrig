@@ -37,6 +37,9 @@ public:
         ARQMA,
         GRAFT,
         KEVA,
+#       ifdef XMRIG_ALGO_RX_YADA
+        YADA,
+#       endif
         RAVEN,
         WOWNERO,
         ZEPHYR,
