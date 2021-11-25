@@ -12,6 +12,7 @@ Option `coin` useful for pools without [algorithm negotiation](https://xmrig.com
 
 | Name | Memory | Version | Description | Notes |
 |------|--------|---------|-------------|-------|
+| `rx/yada` | 2 MB | 6.22.0+ | RandomYADA (RandomX variant for Yada). |  |
 | `kawpow` | - | 6.0.0+ | KawPow (Ravencoin) | GPU only |
 | `astrobwt` | 20 MB | 5.8.0+ | AstroBWT (Dero). |  |
 | `cn-pico/tlo` | 256 KB | 5.5.0+ | CryptoNight-Pico (Talleo). |  |
