@@ -1,4 +1,5 @@
 # v6.16.0
+- [#2411](https://github.com/xmrig/xmrig/pull/2411) Added support for Yada (`rx/yada` algorithm).
 - [#2712](https://github.com/xmrig/xmrig/pull/2712) **GhostRider algorithm (Raptoreum) support**: read the [RELEASE NOTES](src/crypto/ghostrider/README.md) for quick start guide and performance comparisons.
 - [#2682](https://github.com/xmrig/xmrig/pull/2682) Fixed: use cn-heavy optimization only for Vermeer CPUs.
 - [#2684](https://github.com/xmrig/xmrig/pull/2684) MSR mod: fix for error 183.

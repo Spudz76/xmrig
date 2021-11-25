@@ -837,7 +837,7 @@ namespace randomx {
 		if (INFO) std::cout << "; (* = in use, _ = idle)" << std::endl;
 
 		int portCycles = 0;
-		for (int i = 0; i < RandomX_Config.SuperscalarLatency + 4; ++i) {
+		for (int i = 0; i < RandomX_CurrentConfig.SuperscalarLatency + 4; ++i) {
 			std::cout << "; " << std::setw(3) << i << " ";
 			for (int j = 0; j < 3; ++j) {
 				std::cout << (portBusy[i][j] ? '*' : '_');

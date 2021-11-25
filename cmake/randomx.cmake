@@ -42,6 +42,14 @@ if (WITH_RANDOMX)
         src/crypto/rx/RxVm.cpp
     )
 
+    if (WITH_RX_YADA)
+        add_definitions(/DXMRIG_ALGO_RX_YADA)
+        message("-- WITH_RX_YADA=ON (YADACoin algorithm)")
+    else()
+        remove_definitions(/DXMRIG_ALGO_RX_YADA)
+        message("-- WITH_RX_YADA=OFF (YADACoin algorithm)")
+    endif()
+
     if (WITH_ASM AND CMAKE_C_COMPILER_ID MATCHES MSVC)
         enable_language(ASM_MASM)
         list(APPEND SOURCES_CRYPTO
@@ -137,4 +145,12 @@ if (WITH_RANDOMX)
     endif()
 else()
     remove_definitions(/DXMRIG_ALGO_RANDOMX)
+    if (WITH_RX_YADA)
+        message("-- WITH_RANDOMX=OFF but WITH_RX_YADA=ON... forcing OFF")
+        set(WITH_RX_YADA OFF)
+    endif()
+    # intentionally not an `else` in case above negated it
+    if (NOT WITH_RX_YADA)
+        remove_definitions(/DXMRIG_ALGO_RX_YADA)
+    endif()
 endif()

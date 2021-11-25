@@ -111,6 +111,12 @@ bool xmrig::Job::setTarget(const char *target)
     const auto raw    = Cvt::fromHex(target, strlen(target));
     const size_t size = raw.size();
 
+#   ifdef XMRIG_ALGO_RX_YADA
+    if (algorithm() == Algorithm::RX_YADA) {
+        m_target = 0x0000F00000000000ULL + strtoull(target, nullptr, 16);
+    }
+    else
+#   endif
     if (size == 4) {
         m_target = 0xFFFFFFFFFFFFFFFFULL / (0xFFFFFFFFULL / uint64_t(*reinterpret_cast<const uint32_t *>(raw.data())));
     }

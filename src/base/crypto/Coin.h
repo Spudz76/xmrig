@@ -38,6 +38,7 @@ public:
         DERO,
         GRAFT,
         KEVA,
+        YADA,
         RAVEN,
         WOWNERO,
         MAX

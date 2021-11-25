@@ -113,6 +113,9 @@ size_t inline generate<Algorithm::RANDOM_X>(Threads<OclThreads> &threads, const 
     auto rx  = OclThreads(devices, Algorithm::RX_0);
     auto wow = OclThreads(devices, Algorithm::RX_WOW);
     auto arq = OclThreads(devices, Algorithm::RX_ARQ);
+#   ifdef XMRIG_ALGO_RX_YADA
+    auto yda = OclThreads(devices, Algorithm::RX_YADA);
+#   endif
 
     if (!threads.isExist(Algorithm::RX_WOW) && wow != rx) {
         count += threads.move(Algorithm::kRX_WOW, std::move(wow));
@@ -121,6 +124,12 @@ size_t inline generate<Algorithm::RANDOM_X>(Threads<OclThreads> &threads, const 
     if (!threads.isExist(Algorithm::RX_ARQ) && arq != rx) {
         count += threads.move(Algorithm::kRX_ARQ, std::move(arq));
     }
+
+#   ifdef XMRIG_ALGO_RX_YADA
+    if (!threads.isExist(Algorithm::RX_YADA) && yda != rx) {
+        count += threads.move(Algorithm::kRX_YADA, std::move(yda));
+    }
+#   endif
 
     count += threads.move(Algorithm::kRX, std::move(rx));
 
