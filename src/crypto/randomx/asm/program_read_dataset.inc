@@ -14,4 +14,3 @@
 	xor r13, qword ptr [rcx+40]
 	xor r14, qword ptr [rcx+48]
 	xor r15, qword ptr [rcx+56]
-	
