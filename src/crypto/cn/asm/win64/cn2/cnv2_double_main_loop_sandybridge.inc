@@ -319,7 +319,7 @@ sqrt_fix_2_ret_sandybridge:
 	and	ecx, 2097136
 	lea	r8, QWORD PTR [rcx+rsi]
 
-	mov rdx, QWORD PTR [r13+8]	
+	mov rdx, QWORD PTR [r13+8]
 	add	rbp, rax
 	mov	QWORD PTR [r13+8], rbp
 	movdqu xmm11, XMMWORD PTR [rcx+rsi]
