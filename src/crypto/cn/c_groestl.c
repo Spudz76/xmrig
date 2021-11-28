@@ -199,7 +199,7 @@ static void OutputTransformation(groestlHashState *ctx) {
 	RND512P((uint8_t*)y, temp, 0x00000009);
 	for (j = 0; j < 2*COLS512; j++) {
 	  ctx->chaining[j] ^= temp[j];
-	}									
+	}
 }
 
 /* initialise context */
