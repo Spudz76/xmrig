@@ -364,7 +364,7 @@ DECL(randomx_program_aarch64_update_spMix1):
 
 	subs	x3, x3, 1
 	bne	DECL(randomx_program_aarch64_main_loop)
-	
+
 	# Restore x0
 	ldr	x0, [sp], 16
 
