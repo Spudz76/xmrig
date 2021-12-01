@@ -39,7 +39,7 @@ __kernel void Salsa20_XORKeyStream(__global const uint32_t* keys, __global uint3
 		for (uint32_t i = t; i < 128 / sizeof(uint32_t); i += SALSA20_GROUP_SIZE)
 			p[i] = 0;
 	}
-	
+
 	__global const uint32_t* k = keys + g * 8;
 	__global uint32_t* output = outputs + (output_offset + (t * 64)) / sizeof(uint32_t);
 	const uint32_t output_size = output_sizes[g];

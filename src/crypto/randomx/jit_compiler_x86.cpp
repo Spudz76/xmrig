@@ -798,7 +798,7 @@ namespace randomx {
 	void JitCompilerX86::h_ISUB_R(const Instruction& instr) {
 		uint8_t* const p = code;
 		uint32_t pos = codePos;
-		
+
 		const uint32_t src = instr.src % RegistersCount;
 		const uint32_t dst = instr.dst % RegistersCount;
 
@@ -998,7 +998,7 @@ namespace randomx {
 	void JitCompilerX86::h_IMUL_RCP(const Instruction& instr) {
 		uint8_t* const p = code;
 		uint32_t pos = codePos;
-		
+
 		uint64_t divisor = instr.getImm32();
 		if (!isZeroOrPowerOf2(divisor)) {
 			const uint32_t dst = instr.dst % RegistersCount;
