@@ -228,14 +228,18 @@ void xmrig::Network::onLogin(IStrategy *, IClient *client, rapidjson::Document &
     Value algo_perf(kObjectType);
 
     for (const auto &a : algorithms) {
-        algo_perf.AddMember(StringRef(a.name()), m_controller->config()->benchmark().algo_perf[a.id()], allocator);
+        if (m_controller->config()->benchmark().algo_perf[a.id()] > 0.0f) {
+            algo_perf.AddMember(StringRef(a.name()), m_controller->config()->benchmark().algo_perf[a.id()], allocator);
+        }
     }
 
-    params.AddMember("algo-perf", algo_perf, allocator);
+    if (algo_perf.MemberCount() > 0) {
+        params.AddMember("algo-perf", algo_perf, allocator);
 
-    int algo_min_time = m_controller->config()->algoMinTime();
-    if (algo_min_time > 0) {
-        params.AddMember("algo-min-time", algo_min_time, allocator);
+        int algo_min_time = m_controller->config()->algoMinTime();
+        if (algo_min_time > 0) {
+            params.AddMember("algo-min-time", algo_min_time, allocator);
+        }
     }
 #   endif
 }
