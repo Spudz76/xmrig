@@ -35,7 +35,12 @@ struct NvmlHealth
     std::vector<uint32_t> fanSpeed;
     uint32_t clock          = 0;
     uint32_t memClock       = 0;
+    int32_t  perfState      = 0;
     uint32_t power          = 0;
+    uint32_t powerDefault   = 0;
+    uint32_t powerLimit     = 0;
+    uint32_t powerMin       = 0;
+    uint32_t powerMax       = 0;
     uint32_t temperature    = 0;
 };
 

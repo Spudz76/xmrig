@@ -38,6 +38,10 @@ static const char *kNvmlDeviceGetFanSpeed                           = "nvmlDevic
 static const char *kNvmlDeviceGetFanSpeed_v2                        = "nvmlDeviceGetFanSpeed_v2";
 static const char *kNvmlDeviceGetHandleByIndex                      = "nvmlDeviceGetHandleByIndex_v2";
 static const char *kNvmlDeviceGetPciInfo                            = "nvmlDeviceGetPciInfo_v2";
+static const char *kNvmlDeviceGetPerformanceState                   = "nvmlDeviceGetPerformanceState";
+static const char *kNvmlDeviceGetPowerManagementDefaultLimit        = "nvmlDeviceGetPowerManagementDefaultLimit";
+static const char *kNvmlDeviceGetPowerManagementLimit               = "nvmlDeviceGetPowerManagementLimit";
+static const char *kNvmlDeviceGetPowerManagementLimitConstraints    = "nvmlDeviceGetPowerManagementLimitConstraints";
 static const char *kNvmlDeviceGetPowerUsage                         = "nvmlDeviceGetPowerUsage";
 static const char *kNvmlDeviceGetTemperature                        = "nvmlDeviceGetTemperature";
 static const char *kNvmlInit                                        = "nvmlInit_v2";
@@ -53,6 +57,10 @@ static nvmlReturn_t (*pNvmlDeviceGetFanSpeed_v2)(nvmlDevice_t device, uint32_t f
 static nvmlReturn_t (*pNvmlDeviceGetFanSpeed)(nvmlDevice_t device, uint32_t *speed)                                         = nullptr;
 static nvmlReturn_t (*pNvmlDeviceGetHandleByIndex)(uint32_t index, nvmlDevice_t *device)                                    = nullptr;
 static nvmlReturn_t (*pNvmlDeviceGetPciInfo)(nvmlDevice_t device, nvmlPciInfo_t *pci)                                       = nullptr;
+static nvmlReturn_t (*pNvmlDeviceGetPerformanceState)(nvmlDevice_t device, int32_t *state)                                  = nullptr;
+static nvmlReturn_t (*pNvmlDeviceGetPowerManagementDefaultLimit)(nvmlDevice_t device, uint32_t *limit)                      = nullptr;
+static nvmlReturn_t (*pNvmlDeviceGetPowerManagementLimit)(nvmlDevice_t device, uint32_t *limit)                             = nullptr;
+static nvmlReturn_t (*pNvmlDeviceGetPowerManagementLimitConstraints)(nvmlDevice_t device, uint32_t *min, uint32_t *max)     = nullptr;
 static nvmlReturn_t (*pNvmlDeviceGetPowerUsage)(nvmlDevice_t device, uint32_t *power)                                       = nullptr;
 static nvmlReturn_t (*pNvmlDeviceGetTemperature)(nvmlDevice_t device, uint32_t sensorType, uint32_t *temp)                  = nullptr;
 static nvmlReturn_t (*pNvmlInit)()                                                                                          = nullptr;
@@ -139,9 +147,29 @@ NvmlHealth xmrig::NvmlLib::health(nvmlDevice_t device)
 
     NvmlHealth health;
     pNvmlDeviceGetTemperature(device, NVML_TEMPERATURE_GPU, &health.temperature);
+    pNvmlDeviceGetPerformanceState(device, &health.perfState);
+    pNvmlDeviceGetPowerManagementDefaultLimit(device, &health.powerDefault);
+    pNvmlDeviceGetPowerManagementLimit(device, &health.powerLimit);
+    pNvmlDeviceGetPowerManagementLimitConstraints(device, &health.powerMin, &health.powerMax);
     pNvmlDeviceGetPowerUsage(device, &health.power);
     pNvmlDeviceGetClockInfo(device, NVML_CLOCK_SM, &health.clock);
     pNvmlDeviceGetClockInfo(device, NVML_CLOCK_MEM, &health.memClock);
+
+    if (health.powerDefault) {
+        health.powerDefault /= 1000;
+    }
+
+    if (health.powerLimit) {
+        health.powerLimit /= 1000;
+    }
+
+    if (health.powerMin) {
+        health.powerMin /= 1000;
+    }
+
+    if (health.powerMax) {
+        health.powerMax /= 1000;
+    }
 
     if (health.power) {
         health.power /= 1000;
@@ -197,6 +225,10 @@ bool xmrig::NvmlLib::load()
         DLSYM(NvmlDeviceGetFanSpeed);
         DLSYM(NvmlDeviceGetHandleByIndex);
         DLSYM(NvmlDeviceGetPciInfo);
+        DLSYM(NvmlDeviceGetPerformanceState);
+        DLSYM(NvmlDeviceGetPowerManagementDefaultLimit);
+        DLSYM(NvmlDeviceGetPowerManagementLimit);
+        DLSYM(NvmlDeviceGetPowerManagementLimitConstraints);
         DLSYM(NvmlDeviceGetPowerUsage);
         DLSYM(NvmlDeviceGetTemperature);
         DLSYM(NvmlInit);

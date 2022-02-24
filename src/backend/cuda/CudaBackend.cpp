@@ -254,6 +254,24 @@ public:
         for (const auto &device : devices) {
             const auto health = NvmlLib::health(device.nvmlDevice());
 
+            std::string powers;
+            if (health.power) {
+                powers += " ";
+                if (health.powerMin) {
+                    powers += "min " + std::to_string(health.powerMin) + "/";
+                }
+                if (health.powerDefault) {
+                    powers += "dfl " + std::to_string(health.powerDefault) + "/";
+                }
+                if (health.powerMax) {
+                    powers += "max " + std::to_string(health.powerMax) + "/";
+                }
+                if (health.powerLimit) {
+                    powers += "lim " + std::to_string(health.powerLimit) + "/";
+                }
+                powers += std::to_string(health.powerLimit) + "W";
+            }
+
             std::string clocks;
             if (health.clock && health.memClock) {
                 clocks += " " + std::to_string(health.clock) + "/" + std::to_string(health.memClock) + " MHz";
@@ -266,11 +284,12 @@ public:
                 }
             }
 
-            LOG_INFO("%s" CYAN_BOLD(" #%u") YELLOW(" %s") MAGENTA_BOLD("%4uW") CSI "1;%um %2uC" CLEAR WHITE_BOLD("%s") "%s",
+            LOG_INFO("%s" CYAN_BOLD(" #%u") YELLOW(" %s") CYAN_BOLD(" P%d") MAGENTA_BOLD("%s") CSI "1;%um %2uC" CLEAR WHITE_BOLD("%s") "%s",
                      Tags::nvidia(),
                      device.index(),
                      device.topology().toString().data(),
-                     health.power,
+                     health.perfState,
+                     powers.c_str(),
                      health.temperature < 60 ? 32 : (health.temperature > 85 ? 31 : 33),
                      health.temperature,
                      clocks.c_str(),
