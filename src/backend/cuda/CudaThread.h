@@ -44,6 +44,10 @@ public:
     inline int32_t threads() const                           { return m_threads; }
     inline int64_t affinity() const                          { return m_affinity; }
     inline uint32_t index() const                            { return m_index; }
+#   ifdef XMRIG_FEATURE_NVML
+    inline int32_t cclock() const                            { return m_cclock; }
+    inline int32_t mclock() const                            { return m_mclock; }
+#   endif
 
     inline bool operator!=(const CudaThread &other) const    { return !isEqual(other); }
     inline bool operator==(const CudaThread &other) const    { return isEqual(other); }
@@ -57,6 +61,10 @@ private:
     int32_t m_threads       = 0;
     int64_t m_affinity      = -1;
     uint32_t m_index        = 0;
+#   ifdef XMRIG_FEATURE_NVML
+    int32_t m_cclock        = -1;
+    int32_t m_mclock        = -1;
+#   endif
 
 #   ifdef _WIN32
     uint32_t m_bfactor      = 6;
