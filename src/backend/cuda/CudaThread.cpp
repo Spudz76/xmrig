@@ -34,6 +34,10 @@ static const char *kBSleep      = "bsleep";
 static const char *kIndex       = "index";
 static const char *kThreads     = "threads";
 static const char *kDatasetHost = "dataset_host";
+#ifdef XMRIG_FEATURE_NVML
+static const char *kCClock      = "cclock";
+static const char *kMClock      = "mclock";
+#endif
 
 } // namespace xmrig
 
@@ -50,6 +54,10 @@ xmrig::CudaThread::CudaThread(const rapidjson::Value &value)
     m_bfactor   = std::min(Json::getUint(value, kBFactor, m_bfactor), 12U);
     m_bsleep    = Json::getUint(value, kBSleep, m_bsleep);
     m_affinity  = Json::getUint64(value, kAffinity, m_affinity);
+#   ifdef XMRIG_FEATURE_NVML
+    m_cclock    = Json::getInt(value, kCClock);
+    m_mclock    = Json::getInt(value, kMClock);
+#   endif
 
     if (Json::getValue(value, kDatasetHost).IsInt()) {
         m_datasetHost = Json::getInt(value, kDatasetHost, m_datasetHost) != 0;
@@ -80,6 +88,10 @@ bool xmrig::CudaThread::isEqual(const CudaThread &other) const
            m_index       == other.m_index &&
            m_bfactor     == other.m_bfactor &&
            m_bsleep      == other.m_bsleep &&
+#          ifdef XMRIG_FEATURE_NVML
+           m_cclock      == other.m_cclock &&
+           m_mclock      == other.m_mclock &&
+#          endif
            m_datasetHost == other.m_datasetHost;
 }
 
@@ -97,6 +109,10 @@ rapidjson::Value xmrig::CudaThread::toJSON(rapidjson::Document &doc) const
     out.AddMember(StringRef(kBFactor),      bfactor(), allocator);
     out.AddMember(StringRef(kBSleep),       bsleep(), allocator);
     out.AddMember(StringRef(kAffinity),     affinity(), allocator);
+#   ifdef XMRIG_FEATURE_NVML
+    out.AddMember(StringRef(kCClock),       cclock(), allocator);
+    out.AddMember(StringRef(kMClock),       mclock(), allocator);
+#   endif
 
     if (m_datasetHost >= 0) {
         out.AddMember(StringRef(kDatasetHost), m_datasetHost > 0, allocator);
