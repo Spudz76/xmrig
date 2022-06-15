@@ -312,58 +312,69 @@ const char *xmrig::BasicCpuInfo::backend() const
 }
 
 
-xmrig::CpuThreads xmrig::BasicCpuInfo::threads(const Algorithm &algorithm, uint32_t) const
+xmrig::CpuThreads xmrig::BasicCpuInfo::threads(const Algorithm &algorithm, uint32_t limit) const
 {
-    const size_t count = std::thread::hardware_concurrency();
+    const uint32_t count = std::thread::hardware_concurrency();
+    const uint32_t count_limit  = std::max(static_cast<uint32_t>(count * (limit / 100.0f)), 1U);
+    const uint32_t count_limit2 = std::max(static_cast<uint32_t>(count / 2), count_limit);
+    const uint32_t count_limit4 = std::max(static_cast<uint32_t>(count / 4), count_limit);
 
     if (count == 1) {
         return 1;
     }
 
     const auto f = algorithm.family();
-#   ifdef XMRIG_ALGO_CN_GPU
-    if (algorithm == Algorithm::CN_GPU) {
-        return count;
-    }
-#   endif
-
 #   ifdef XMRIG_ALGO_CN_LITE
     if (f == Algorithm::CN_LITE) {
-        return CpuThreads(count, 1);
+        return CpuThreads(count_limit, 1);
     }
 #   endif
 
 #   ifdef XMRIG_ALGO_CN_PICO
     if (f == Algorithm::CN_PICO) {
-        return CpuThreads(count, 2);
+        return CpuThreads(count_limit, 2);
     }
 #   endif
 
 #   ifdef XMRIG_ALGO_CN_FEMTO
     if (f == Algorithm::CN_FEMTO) {
-        return CpuThreads(count, 2);
+        return CpuThreads(count_limit, 2);
     }
 #   endif
 
 #   ifdef XMRIG_ALGO_CN_HEAVY
     if (f == Algorithm::CN_HEAVY) {
-        return CpuThreads(std::max<size_t>(count / 4, 1), 1);
+        return CpuThreads(count_limit4, 1);
+    }
+#   endif
+
+#   ifdef XMRIG_ALGO_CN_GPU
+    if (algorithm == Algorithm::CN_GPU) {
+        return count_limit;
     }
 #   endif
 
 #   ifdef XMRIG_ALGO_RANDOMX
     if (f == Algorithm::RANDOM_X) {
         if (algorithm == Algorithm::RX_WOW) {
-            return count;
+            return count_limit;
         }
 
-        return std::max<size_t>(count / 2, 1);
+        if (algorithm == Algorithm::RX_XLA) {
+            CpuThreads threads;
+            for (size_t i = 0; i < count_limit2; ++i) {
+                threads.add(i, 0);
+            }
+            return threads;
+        }
+
+        return count_limit2;
     }
 #   endif
 
 #   ifdef XMRIG_ALGO_ARGON2
     if (f == Algorithm::ARGON2) {
-        return count;
+        return count_limit;
     }
 #   endif
 
@@ -373,7 +384,7 @@ xmrig::CpuThreads xmrig::BasicCpuInfo::threads(const Algorithm &algorithm, uint3
     }
 #   endif
 
-    return CpuThreads(std::max<size_t>(count / 2, 1), 1);
+    return CpuThreads(count_limit2, 1);
 }
 
 
