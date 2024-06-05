@@ -164,6 +164,10 @@ public:
         Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s") WHITE_BOLD("%s") "/" WHITE_BOLD("%s") BLACK_BOLD("/%s"), kLabel,
                    CudaLib::version(runtimeVersion).c_str(), CudaLib::version(driverVersion).c_str(), CudaLib::pluginVersion());
 
+        if (!strstr(CudaLib::pluginVersion(), "-mo")) {
+            LOG_WARN("%s " RED_BOLD("INCORRECT CUDA PLUGIN") YELLOW(" (for full support use https://github.com/MoneroOcean/xmrig-cuda)"), Tags::nvidia());
+        }
+
 #       ifdef XMRIG_FEATURE_NVML
         if (cuda.isNvmlEnabled()) {
             if (NvmlLib::init(cuda.nvmlLoader())) {
