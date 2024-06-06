@@ -115,28 +115,32 @@ size_t inline generate<Algorithm::RANDOM_X>(Threads<CudaThreads> &threads, const
     size_t count = 0;
 
     auto rx  = CudaThreads(devices, Algorithm::RX_0);
-    auto wow = CudaThreads(devices, Algorithm::RX_WOW);
     auto arq = CudaThreads(devices, Algorithm::RX_ARQ);
-    auto xeq = CudaThreads(devices, Algorithm::RX_XEQ);
     auto kva = CudaThreads(devices, Algorithm::RX_KEVA);
+    auto wow = CudaThreads(devices, Algorithm::RX_WOW);
+#   ifdef XMRIG_ALGO_RX_XEQ
+    auto xeq = CudaThreads(devices, Algorithm::RX_XEQ);
+#   endif
 
-    if (!threads.isExist(Algorithm::RX_WOW) && wow != rx) {
-        count += threads.move(Algorithm::kRX_WOW, std::move(wow));
-    }
+    count += threads.move(Algorithm::kRX, std::move(rx));
 
     if (!threads.isExist(Algorithm::RX_ARQ) && arq != rx) {
         count += threads.move(Algorithm::kRX_ARQ, std::move(arq));
-    }
-
-    if (!threads.isExist(Algorithm::RX_XEQ) && xeq != rx) {
-        count += threads.move(Algorithm::kRX_XEQ, std::move(xeq));
     }
 
     if (!threads.isExist(Algorithm::RX_KEVA) && kva != rx) {
         count += threads.move(Algorithm::kRX_KEVA, std::move(kva));
     }
 
-    count += threads.move(Algorithm::kRX, std::move(rx));
+    if (!threads.isExist(Algorithm::RX_WOW) && wow != rx) {
+        count += threads.move(Algorithm::kRX_WOW, std::move(wow));
+    }
+
+#   ifdef XMRIG_ALGO_RX_XEQ
+    if (!threads.isExist(Algorithm::RX_XEQ) && xeq != rx) {
+        count += threads.move(Algorithm::kRX_XEQ, std::move(xeq));
+    }
+#   endif
 
     return count;
 }

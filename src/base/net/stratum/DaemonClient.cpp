@@ -242,9 +242,11 @@ void xmrig::DaemonClient::setPool(const Pool &pool)
         m_coin = Coin::WOWNERO;
     }
 
+#   ifdef XMRIG_ALGO_RX_XEQ
     if (!m_coin.isValid() && pool.algorithm() == Algorithm::RX_XEQ) {
         m_coin = Coin::XEQ;
     }
+#   endif
 }
 
 

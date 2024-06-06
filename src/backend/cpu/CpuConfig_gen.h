@@ -115,6 +115,8 @@ size_t inline generate<Algorithm::RANDOM_X>(Threads<CpuThreads> &threads, uint32
     auto cpuInfo = Cpu::info();
     auto wow     = cpuInfo->threads(Algorithm::RX_WOW, limit);
 
+    count += generate(Algorithm::kRX, threads, Algorithm::RX_0, limit);
+
     if (!threads.isExist(Algorithm::RX_ARQ)) {
         auto arq = cpuInfo->threads(Algorithm::RX_ARQ, limit);
         if (arq == wow) {
@@ -123,17 +125,6 @@ size_t inline generate<Algorithm::RANDOM_X>(Threads<CpuThreads> &threads, uint32
         }
         else {
             count += threads.move(Algorithm::kRX_ARQ, std::move(arq));
-        }
-    }
-
-    if (!threads.isExist(Algorithm::RX_XEQ)) {
-        auto xeq = cpuInfo->threads(Algorithm::RX_XEQ, limit);
-        if (xeq == wow) {
-            threads.setAlias(Algorithm::RX_XEQ, Algorithm::kRX_WOW);
-            ++count;
-        }
-        else {
-            count += threads.move(Algorithm::kRX_XEQ, std::move(xeq));
         }
     }
 
@@ -152,13 +143,31 @@ size_t inline generate<Algorithm::RANDOM_X>(Threads<CpuThreads> &threads, uint32
         count += threads.move(Algorithm::kRX_WOW, std::move(wow));
     }
 
+#   ifdef XMRIG_ALGO_RX_XEQ
+    if (!threads.isExist(Algorithm::RX_XEQ)) {
+        auto xeq = cpuInfo->threads(Algorithm::RX_XEQ, limit);
+        if (xeq == wow) {
+            threads.setAlias(Algorithm::RX_XEQ, Algorithm::kRX_WOW);
+            ++count;
+        }
+        else {
+            count += threads.move(Algorithm::kRX_XEQ, std::move(xeq));
+        }
+    }
+#   endif
+
 #   ifdef XMRIG_ALGO_RX_XLA
     if (!threads.isExist(Algorithm::RX_XLA)) {
         count += generate(Algorithm::kRX_XLA, threads, Algorithm::RX_XLA, limit);
     }
 #   endif
 
-    count += generate(Algorithm::kRX, threads, Algorithm::RX_0, limit);
+#   ifdef XMRIG_ALGO_RX_YADA
+    if (!threads.isExist(Algorithm::RX_YADA)) {
+        auto yada = cpuInfo->threads(Algorithm::RX_YADA, limit);
+        count += threads.move(Algorithm::kRX_YADA, std::move(yada));
+    }
+#   endif
 
     return count;
 }
