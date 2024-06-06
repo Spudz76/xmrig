@@ -59,6 +59,37 @@ extern "C" {
 
 #include "crypto/rx/Profiler.h"
 
+RandomX_ConfigurationArqma::RandomX_ConfigurationArqma()
+{
+	ArgonIterations = 1;
+	ArgonSalt = "RandomARQ\x01";
+	ProgramIterations = 1024;
+	ProgramCount = 4;
+	ScratchpadL2_Size = 131072;
+	ScratchpadL3_Size = 262144;
+}
+
+RandomX_ConfigurationGraft::RandomX_ConfigurationGraft()
+{
+	ArgonLanes = 2;
+	ArgonSalt = "RandomX-Graft\x01";
+	ProgramSize = 280;
+	RANDOMX_FREQ_IROR_R = 7;
+	RANDOMX_FREQ_IROL_R = 3;
+}
+
+RandomX_ConfigurationKeva::RandomX_ConfigurationKeva()
+{
+	ArgonSalt = "RandomKV\x01";
+	ScratchpadL2_Size = 131072;
+	ScratchpadL3_Size = 1048576;
+}
+
+RandomX_ConfigurationSafex::RandomX_ConfigurationSafex()
+{
+	ArgonSalt = "RandomSFX\x01";
+}
+
 RandomX_ConfigurationWownero::RandomX_ConfigurationWownero()
 {
 	ArgonSalt = "RandomWOW\x01";
@@ -86,16 +117,7 @@ RandomX_ConfigurationWownero::RandomX_ConfigurationWownero()
 	fillAes4Rx4_Key[7] = fillAes4Rx4_Key[3];
 }
 
-RandomX_ConfigurationArqma::RandomX_ConfigurationArqma()
-{
-	ArgonIterations = 1;
-	ArgonSalt = "RandomARQ\x01";
-	ProgramIterations = 1024;
-	ProgramCount = 4;
-	ScratchpadL2_Size = 131072;
-	ScratchpadL3_Size = 262144;
-}
-
+#ifdef XMRIG_ALGO_RX_XEQ
 RandomX_ConfigurationEquilibria::RandomX_ConfigurationEquilibria()
 {
   ArgonIterations = 1;
@@ -104,35 +126,6 @@ RandomX_ConfigurationEquilibria::RandomX_ConfigurationEquilibria()
   ProgramCount = 4;
   ScratchpadL2_Size = 131072;
   ScratchpadL3_Size = 262144;
-}
-
-RandomX_ConfigurationGraft::RandomX_ConfigurationGraft()
-{
-	ArgonLanes = 2;
-	ArgonSalt = "RandomX-Graft\x01";
-	ProgramSize = 280;
-	RANDOMX_FREQ_IROR_R = 7;
-	RANDOMX_FREQ_IROL_R = 3;
-}
-
-RandomX_ConfigurationSafex::RandomX_ConfigurationSafex()
-{
-	ArgonSalt = "RandomSFX\x01";
-}
-
-RandomX_ConfigurationKeva::RandomX_ConfigurationKeva()
-{
-	ArgonSalt = "RandomKV\x01";
-	ScratchpadL2_Size = 131072;
-	ScratchpadL3_Size = 1048576;
-}
-
-#ifdef XMRIG_ALGO_RX_YADA
-RandomX_ConfigurationYada::RandomX_ConfigurationYada()
-{
-	ArgonSalt = "RandomXYadaCoin\x03";
-	SuperscalarLatency = 150;
-	ArgonIterations = 4;
 }
 #endif
 
@@ -153,6 +146,15 @@ RandomX_ConfigurationScala::RandomX_ConfigurationScala()
 
 	RANDOMX_FREQ_IADD_RS = 25;
 	RANDOMX_FREQ_CBRANCH = 16;
+}
+#endif
+
+#ifdef XMRIG_ALGO_RX_YADA
+RandomX_ConfigurationYada::RandomX_ConfigurationYada()
+{
+	ArgonSalt = "RandomXYadaCoin\x03";
+	SuperscalarLatency = 150;
+	ArgonIterations = 4;
 }
 #endif
 
@@ -485,17 +487,17 @@ typedef void(randomx::JitCompilerX86::* InstructionGeneratorX86_2)(const randomx
 }
 
 RandomX_ConfigurationMonero RandomX_MoneroConfig;
-RandomX_ConfigurationWownero RandomX_WowneroConfig;
 RandomX_ConfigurationArqma RandomX_ArqmaConfig;
 RandomX_ConfigurationEquilibria RandomX_EquilibriaConfig;
 RandomX_ConfigurationGraft RandomX_GraftConfig;
-RandomX_ConfigurationSafex RandomX_SafexConfig;
 RandomX_ConfigurationKeva RandomX_KevaConfig;
-#ifdef XMRIG_ALGO_RX_YADA
-RandomX_ConfigurationYada RandomX_YadaConfig;
-#endif
+RandomX_ConfigurationSafex RandomX_SafexConfig;
+RandomX_ConfigurationWownero RandomX_WowneroConfig;
 #ifdef XMRIG_ALGO_RX_XLA
 RandomX_ConfigurationScala RandomX_ScalaConfig;
+#endif
+#ifdef XMRIG_ALGO_RX_YADA
+RandomX_ConfigurationYada RandomX_YadaConfig;
 #endif
 
 alignas(64) RandomX_ConfigurationBase RandomX_CurrentConfig;

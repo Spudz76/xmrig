@@ -136,7 +136,9 @@ double MoBenchmark::get_algo_perf(Algorithm::Id algo) const {
 #       endif
 #       ifdef XMRIG_ALGO_RANDOMX
         case Algorithm::RX_SFX:          return algo_perf[Algorithm::RX_0];
+#       ifdef XMRIG_ALGO_RX_XEQ
         case Algorithm::RX_XEQ:          return algo_perf[Algorithm::RX_ARQ];
+#       endif
 #       endif
         default:                         return algo_perf[algo];
     }

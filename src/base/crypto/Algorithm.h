@@ -79,7 +79,9 @@ public:
         RX_0            = 0x72151200,   // "rx/0"             RandomX (reference configuration).
         RX_WOW          = 0x72141177,   // "rx/wow"           RandomWOW (Wownero).
         RX_ARQ          = 0x72121061,   // "rx/arq"           RandomARQ (Arqma).
-        RX_XEQ          = 0x72121000,
+#       ifdef XMRIG_ALGO_RX_XEQ
+        RX_XEQ          = 0x72121000,   // "rx/xeq"           RandomXEQ (Equilibria).
+#       endif
         RX_GRAFT        = 0x72151267,   // "rx/graft"         RandomGRAFT (Graft).
         RX_SFX          = 0x72151273,   // "rx/sfx"           RandomSFX (Safex Cash).
         RX_KEVA         = 0x7214116b,   // "rx/keva"          RandomKEVA (Keva).
