@@ -114,32 +114,36 @@ size_t inline generate<Algorithm::RANDOM_X>(Threads<OclThreads> &threads, const 
     size_t count = 0;
 
     auto rx  = OclThreads(devices, Algorithm::RX_0);
-    auto wow = OclThreads(devices, Algorithm::RX_WOW);
     auto arq = OclThreads(devices, Algorithm::RX_ARQ);
+    auto wow = OclThreads(devices, Algorithm::RX_WOW);
+#   ifdef XMRIG_ALGO_RX_XEQ
     auto xeq = OclThreads(devices, Algorithm::RX_XEQ);
+#   endif
 #   ifdef XMRIG_ALGO_RX_YADA
     auto yda = OclThreads(devices, Algorithm::RX_YADA);
 #   endif
+
+    count += threads.move(Algorithm::kRX, std::move(rx));
+
+    if (!threads.isExist(Algorithm::RX_ARQ) && arq != rx) {
+        count += threads.move(Algorithm::kRX_ARQ, std::move(arq));
+    }
 
     if (!threads.isExist(Algorithm::RX_WOW) && wow != rx) {
         count += threads.move(Algorithm::kRX_WOW, std::move(wow));
     }
 
-    if (!threads.isExist(Algorithm::RX_ARQ) && arq != rx) {
-        count += threads.move(Algorithm::kRX_ARQ, std::move(arq));
+#   ifdef XMRIG_ALGO_RX_XEQ
+    if (!threads.isExist(Algorithm::RX_XEQ) && xeq != rx) {
+        count += threads.move(Algorithm::kRX_XEQ, std::move(xeq));
     }
+#   endif
 
 #   ifdef XMRIG_ALGO_RX_YADA
     if (!threads.isExist(Algorithm::RX_YADA) && yda != rx) {
         count += threads.move(Algorithm::kRX_YADA, std::move(yda));
     }
 #   endif
-
-    if (!threads.isExist(Algorithm::RX_XEQ) && xeq != rx) {
-        count += threads.move(Algorithm::kRX_XEQ, std::move(xeq));
-    }
-
-    count += threads.move(Algorithm::kRX, std::move(rx));
 
     return count;
 }
