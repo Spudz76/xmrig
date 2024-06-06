@@ -35,16 +35,18 @@ public:
         MONERO,
         SUMO,
         ARQ,
-        XEQ,
         GRAFT,
         KEVA,
+#       ifdef XMRIG_ALGO_RX_XEQ
+        XEQ,
+#       endif
+#       ifdef XMRIG_ALGO_RX_YADA
+        YADA,
+#       endif
         RAVEN,
         WOWNERO,
         ZEPHYR,
         TOWNFORGE,
-#       ifdef XMRIG_ALGO_RX_YADA
-        YADA,
-#       endif
         MAX
     };
 

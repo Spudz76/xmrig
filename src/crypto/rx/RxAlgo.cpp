@@ -32,30 +32,34 @@ xmrig::Algorithm::Id xmrig::RxAlgo::apply(Algorithm::Id algorithm)
 const RandomX_ConfigurationBase *xmrig::RxAlgo::base(Algorithm::Id algorithm)
 {
     switch (algorithm) {
-    case Algorithm::RX_WOW:
-        return &RandomX_WowneroConfig;
-
     case Algorithm::RX_ARQ:
-//    case Algorithm::RX_XEQ:
         return &RandomX_ArqmaConfig;
-
-    case Algorithm::RX_XEQ:
-        return &RandomX_EquilibriaConfig;
 
     case Algorithm::RX_GRAFT:
         return &RandomX_GraftConfig;
 
+    case Algorithm::RX_KEVA:
+        return &RandomX_KevaConfig;
+
     case Algorithm::RX_SFX:
         return &RandomX_SafexConfig;
 
-#   ifdef XMRIG_ALGO_RX_YADA
-    case Algorithm::RX_YADA:
-        return &RandomX_YadaConfig;
+    case Algorithm::RX_WOW:
+        return &RandomX_WowneroConfig;
+
+#   ifdef XMRIG_ALGO_RX_XEQ
+    case Algorithm::RX_XEQ:
+        return &RandomX_EquilibriaConfig;
 #   endif
 
 #   ifdef XMRIG_ALGO_RX_XLA
     case Algorithm::RX_XLA:
         return &RandomX_ScalaConfig;
+#   endif
+
+#   ifdef XMRIG_ALGO_RX_YADA
+    case Algorithm::RX_YADA:
+        return &RandomX_YadaConfig;
 #   endif
 
     default:
