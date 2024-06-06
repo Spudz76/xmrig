@@ -34,6 +34,7 @@
 #include "base/io/log/Log.h"
 #include "base/net/stratum/Job.h"
 #include "crypto/cn/CnAlgo.h"
+#include <stdexcept>
 
 
 xmrig::OclRyoRunner::OclRyoRunner(size_t index, const OclLaunchData &data) : OclBaseRunner(index, data)
@@ -66,7 +67,7 @@ size_t xmrig::OclRyoRunner::bufferSize() const
 }
 
 
-void xmrig::OclRyoRunner::run(uint32_t nonce, uint32_t *hashOutput)
+void xmrig::OclRyoRunner::run(uint32_t nonce, uint32_t /*nonce_offset*/, uint32_t *hashOutput)
 {
     static const cl_uint zero = 0;
 
