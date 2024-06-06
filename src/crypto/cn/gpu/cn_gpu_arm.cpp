@@ -161,10 +161,10 @@ template<size_t ITER, uint32_t MASK>
 void cn_gpu_inner_arm(const uint8_t *spad, uint8_t *lpad)
 {
     uint32_t s = reinterpret_cast<const uint32_t*>(spad)[0] >> 8;
-    int32_t *idx0 = scratchpad_ptr<MASK>(lpad, s, 0);
-    int32_t *idx1 = scratchpad_ptr<MASK>(lpad, s, 1);
-    int32_t *idx2 = scratchpad_ptr<MASK>(lpad, s, 2);
-    int32_t *idx3 = scratchpad_ptr<MASK>(lpad, s, 3);
+    int32_t *gdx0 = scratchpad_ptr<MASK>(lpad, s, 0);
+    int32_t *gdx1 = scratchpad_ptr<MASK>(lpad, s, 1);
+    int32_t *gdx2 = scratchpad_ptr<MASK>(lpad, s, 2);
+    int32_t *gdx3 = scratchpad_ptr<MASK>(lpad, s, 3);
     float32x4_t sum0 = vdupq_n_f32(0.0f);
 
     for (size_t i = 0; i < ITER; i++) {
@@ -172,10 +172,10 @@ void cn_gpu_inner_arm(const uint8_t *spad, uint8_t *lpad)
         int32x4_t v0, v1, v2, v3;
         float32x4_t suma, sumb, sum1, sum2, sum3;
 
-        prep_dv(idx0, v0, n0);
-        prep_dv(idx1, v1, n1);
-        prep_dv(idx2, v2, n2);
-        prep_dv(idx3, v3, n3);
+        prep_dv(gdx0, v0, n0);
+        prep_dv(gdx1, v1, n1);
+        prep_dv(gdx2, v2, n2);
+        prep_dv(gdx3, v3, n3);
         float32x4_t rc = sum0;
 
         int32x4_t out, out2;
@@ -185,7 +185,7 @@ void cn_gpu_inner_arm(const uint8_t *spad, uint8_t *lpad)
         single_compute_wrap<2>(n0, n3, n1, n2, 1.3593750f, rc, sumb, out);
         single_compute_wrap<3>(n0, n3, n2, n1, 1.3671875f, rc, sumb, out);
         sum0 = vaddq_f32(suma, sumb);
-        vst1q_s32(idx0, veorq_s32(v0, out));
+        vst1q_s32(gdx0, veorq_s32(v0, out));
         out2 = out;
 
         out = vdupq_n_s32(0);
@@ -194,7 +194,7 @@ void cn_gpu_inner_arm(const uint8_t *spad, uint8_t *lpad)
         single_compute_wrap<2>(n1, n3, n0, n2, 1.3828125f, rc, sumb, out);
         single_compute_wrap<3>(n1, n3, n2, n0, 1.3046875f, rc, sumb, out);
         sum1 = vaddq_f32(suma, sumb);
-        vst1q_s32(idx1, veorq_s32(v1, out));
+        vst1q_s32(gdx1, veorq_s32(v1, out));
         out2 = veorq_s32(out2, out);
 
         out = vdupq_n_s32(0);
@@ -203,7 +203,7 @@ void cn_gpu_inner_arm(const uint8_t *spad, uint8_t *lpad)
         single_compute_wrap<2>(n2, n3, n1, n0, 1.2578125f, rc, sumb, out);
         single_compute_wrap<3>(n2, n3, n0, n1, 1.2890625f, rc, sumb, out);
         sum2 = vaddq_f32(suma, sumb);
-        vst1q_s32(idx2, veorq_s32(v2, out));
+        vst1q_s32(gdx2, veorq_s32(v2, out));
         out2 = veorq_s32(out2, out);
 
         out = vdupq_n_s32(0);
@@ -212,7 +212,7 @@ void cn_gpu_inner_arm(const uint8_t *spad, uint8_t *lpad)
         single_compute_wrap<2>(n3, n0, n1, n2, 1.3359375f, rc, sumb, out);
         single_compute_wrap<3>(n3, n0, n2, n1, 1.4609375f, rc, sumb, out);
         sum3 = vaddq_f32(suma, sumb);
-        vst1q_s32(idx3, veorq_s32(v3, out));
+        vst1q_s32(gdx3, veorq_s32(v3, out));
         out2 = veorq_s32(out2, out);
 
         sum0 = vaddq_f32(sum0, sum1);
@@ -230,10 +230,10 @@ void cn_gpu_inner_arm(const uint8_t *spad, uint8_t *lpad)
 
         // vs is now between 0 and 1
         sum0 = vdivq_f32(sum0, cc2);
-        idx0 = scratchpad_ptr<MASK>(lpad, n, 0);
-        idx1 = scratchpad_ptr<MASK>(lpad, n, 1);
-        idx2 = scratchpad_ptr<MASK>(lpad, n, 2);
-        idx3 = scratchpad_ptr<MASK>(lpad, n, 3);
+        gdx0 = scratchpad_ptr<MASK>(lpad, n, 0);
+        gdx1 = scratchpad_ptr<MASK>(lpad, n, 1);
+        gdx2 = scratchpad_ptr<MASK>(lpad, n, 2);
+        gdx3 = scratchpad_ptr<MASK>(lpad, n, 3);
     }
 }
 
