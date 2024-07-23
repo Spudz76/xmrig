@@ -47,6 +47,7 @@ public:
         WOWNERO,
         ZEPHYR,
         TOWNFORGE,
+        SALVIUM,
         MAX
     };
 
