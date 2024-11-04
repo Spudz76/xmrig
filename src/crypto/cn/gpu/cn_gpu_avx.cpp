@@ -34,10 +34,10 @@
 
 
 #ifndef _mm256_bslli_epi128
-#    define _mm256_bslli_epi128(a, count) _mm256_slli_si256((a), (count))
+#   define _mm256_bslli_epi128(a, count) _mm256_slli_si256((a), (count))
 #endif
 #ifndef _mm256_bsrli_epi128
-#    define _mm256_bsrli_epi128(a, count) _mm256_srli_si256((a), (count))
+#   define _mm256_bsrli_epi128(a, count) _mm256_srli_si256((a), (count))
 #endif
 
 
@@ -146,7 +146,8 @@ void cn_gpu_inner_avx(const uint8_t* spad, uint8_t* lpad)
     __m256i* gdx2 = scratchpad_ptr<MASK>(lpad, s, 2);
     __m256 sum0 = _mm256_setzero_ps();
 
-    for (size_t i = 0; i < ITER; i++) {
+    for(size_t i = 0; i < ITER; i++)
+    {
         __m256i v01, v23;
         __m256 suma, sumb, sum1;
         __m256 rc = sum0;
