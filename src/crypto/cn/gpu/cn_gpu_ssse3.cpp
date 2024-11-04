@@ -137,7 +137,8 @@ void cn_gpu_inner_ssse3(const uint8_t* spad, uint8_t* lpad)
     __m128i* gdx3 = scratchpad_ptr<MASK>(lpad, s, 3);
     __m128 sum0 = _mm_setzero_ps();
 
-    for (size_t i = 0; i < ITER; i++) {
+    for(size_t i = 0; i < ITER; i++)
+    {
         __m128 n0, n1, n2, n3;
         __m128i v0, v1, v2, v3;
         __m128 suma, sumb, sum1, sum2, sum3;

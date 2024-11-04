@@ -57,7 +57,6 @@ extern bool ocl_generic_kawpow_generator(const OclDevice& device, const Algorith
 
 extern bool ocl_vega_cn_generator(const OclDevice &device, const Algorithm &algorithm, OclThreads &threads);
 extern bool ocl_generic_cn_generator(const OclDevice &device, const Algorithm &algorithm, OclThreads &threads);
-
 #ifdef XMRIG_ALGO_CN_GPU
 extern bool ocl_generic_cn_gpu_generator(const OclDevice &device, const Algorithm &algorithm, OclThreads &threads);
 #endif
