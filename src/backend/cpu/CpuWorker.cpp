@@ -36,8 +36,6 @@
 #include "crypto/rx/RxCache.h"
 #include "crypto/rx/RxDataset.h"
 #include "crypto/rx/RxVm.h"
-#include "crypto/ghostrider/ghostrider.h"
-#include "crypto/flex/flex.h"
 #include "net/JobResults.h"
 
 
@@ -45,6 +43,13 @@
 #   include "crypto/randomx/randomx.h"
 #endif
 
+#ifdef XMRIG_ALGO_GHOSTRIDER
+#include "crypto/ghostrider/ghostrider.h"
+#endif
+
+#ifdef XMRIG_ALGO_FLEX
+#include "crypto/flex/flex.h"
+#endif
 
 #ifdef XMRIG_FEATURE_BENCHMARK
 #   include "backend/common/benchmark/BenchState.h"
@@ -172,8 +177,10 @@ bool xmrig::CpuWorker<N>::selfTest()
         switch (m_algorithm.id()) {
             case Algorithm::GHOSTRIDER_RTM:
                 return (N == 8) && verify(Algorithm::GHOSTRIDER_RTM, test_output_gr);
+#           ifdef XMRIG_ALGO_FLEX
             case Algorithm::FLEX_KCN:
                 return (N == 1) && verify(Algorithm::FLEX_KCN, test_output_flex);
+#           endif
             default:;
         }
     }
@@ -345,6 +352,7 @@ void xmrig::CpuWorker<N>::start()
                                 valid = false;
                             }
                             break;
+#                       ifdef XMRIG_ALGO_FLEX
                         case Algorithm::FLEX_KCN:
                             if (N == 1) {
                                 flex_hash(reinterpret_cast<const char*>(m_job.blob()), reinterpret_cast<char*>(m_hash), m_ctx);
@@ -352,6 +360,7 @@ void xmrig::CpuWorker<N>::start()
                                 valid = false;
                             }
                             break;
+#                       endif
                         default:
                             valid = false;
                     }
@@ -451,6 +460,7 @@ bool xmrig::CpuWorker<N>::verify(const Algorithm &algorithm, const uint8_t *refe
 
         return true;
       }
+#     ifdef XMRIG_ALGO_FLEX
       case Algorithm::FLEX_KCN: {
         const uint8_t header[80] = {
           0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -462,6 +472,7 @@ bool xmrig::CpuWorker<N>::verify(const Algorithm &algorithm, const uint8_t *refe
         flex_hash(reinterpret_cast<const char*>(header), hash, m_ctx);
         return memcmp(referenceValue, hash, sizeof hash) == 0;
       }
+#     endif
       default:;
     }
 #   endif

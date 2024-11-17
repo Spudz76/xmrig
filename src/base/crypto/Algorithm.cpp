@@ -112,8 +112,10 @@ const char *Algorithm::kKAWPOW_RVN      = "kawpow";
 #ifdef XMRIG_ALGO_GHOSTRIDER
 const char* Algorithm::kGHOSTRIDER      = "ghostrider";
 const char* Algorithm::kGHOSTRIDER_RTM  = "ghostrider";
+#ifdef XMRIG_ALGO_FLEX
 const char* Algorithm::kFLEX            = "flex";
 const char* Algorithm::kFLEX_KCN        = "flex";
+#endif
 #endif
 
 
@@ -190,7 +192,9 @@ static const std::map<uint32_t, const char *> kAlgorithmNames = {
 
 #   ifdef XMRIG_ALGO_GHOSTRIDER
     ALGO_NAME(GHOSTRIDER_RTM),
+#   ifdef XMRIG_ALGO_FLEX
     ALGO_NAME(FLEX_KCN),
+#   endif
 #   endif
 };
 
@@ -323,8 +327,10 @@ static const std::map<const char *, Algorithm::Id, aliasCompare> kAlgorithmAlias
 #   ifdef XMRIG_ALGO_GHOSTRIDER
     ALGO_ALIAS_AUTO(GHOSTRIDER_RTM), ALGO_ALIAS(GHOSTRIDER_RTM, "ghostrider/rtm"),
                                      ALGO_ALIAS(GHOSTRIDER_RTM, "gr"),
+#   ifdef XMRIG_ALGO_FLEX
     ALGO_ALIAS_AUTO(FLEX_KCN), ALGO_ALIAS(FLEX_KCN, "flex/kcn"),
                                ALGO_ALIAS(FLEX_KCN, "flex"),
+#   endif
 #   endif
 };
 
@@ -414,8 +420,12 @@ std::vector<xmrig::Algorithm> xmrig::Algorithm::all(const std::function<bool(con
 #       endif
         AR2_CHUKWA, AR2_CHUKWA_V2, AR2_WRKZ,
         KAWPOW_RVN,
+#       ifdef XMRIG_ALGO_GHOSTRIDER
         GHOSTRIDER_RTM,
+#       ifdef XMRIG_ALGO_FLEX
         FLEX_KCN
+#       endif
+#       endif
     };
 
     Algorithms out;
