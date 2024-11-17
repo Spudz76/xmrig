@@ -260,7 +260,11 @@ xmrig::CpuThreads xmrig::HwlocCpuInfo::allThreads(const Algorithm &algorithm, ui
     CpuThreads threads;
     threads.reserve(m_threads);
 
+#   ifdef XMRIG_ALGO_GHOSTRIDER
     const uint32_t intensity = (algorithm.id() == Algorithm::GHOSTRIDER_RTM) ? 8 : 0;
+#   else
+    const uint32_t intensity = 0;
+#   endif
 
     for (const int32_t pu : m_units) {
         threads.add(pu, intensity);

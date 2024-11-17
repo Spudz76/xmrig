@@ -175,10 +175,12 @@ void MoBenchmark::start() {
 
 #     ifdef XMRIG_ALGO_GHOSTRIDER
       case Algorithm::GHOSTRIDER_RTM:
+#     ifdef XMRIG_ALGO_FLEX
       case Algorithm::FLEX_KCN:
           m_bench_job.setBlob("000000208c246d0b90c3b389c4086e8b672ee040d64db5b9648527133e217fbfa48da64c0f3c0a0b0e8350800568b40fbb323ac3ccdf2965de51b9aaeb939b4f11ff81c49b74a16156ff251c00000000");
           m_bench_job.setDiff(1000);
           break;
+#     endif
 #     endif
 
       default:

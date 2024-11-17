@@ -57,7 +57,9 @@ class MoBenchmark : public IJobResultListener {
             // so MSR setting doesn't have to flip back and forth
 #           ifdef XMRIG_ALGO_GHOSTRIDER
             Algorithm::GHOSTRIDER_RTM,
+#           ifdef XMRIG_ALGO_FLEX
             Algorithm::FLEX_KCN,
+#           endif
 #           endif
 #           ifdef XMRIG_ALGO_CN_HEAVY
             Algorithm::CN_HEAVY_XHV,

@@ -189,7 +189,9 @@ size_t inline generate<Algorithm::GHOSTRIDER>(Threads<CpuThreads>& threads, uint
 {
     size_t count = 0;
     count += threads.move(Algorithm::kGHOSTRIDER, std::move(Cpu::info()->threads(Algorithm::GHOSTRIDER_RTM, limit)));
+#   ifdef XMRIG_ALGO_FLEX
     count += threads.move(Algorithm::kFLEX, std::move(Cpu::info()->threads(Algorithm::FLEX_KCN, limit)));
+#   endif
     return count;
 }
 #endif

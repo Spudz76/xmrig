@@ -14,6 +14,7 @@ option(WITH_RX_XLA          "Enable panthera algorithm (requires RandomX)" ON)
 option(WITH_ARGON2          "Enable Argon2 algorithms family" ON)
 option(WITH_KAWPOW          "Enable KawPow algorithms family" ON)
 option(WITH_GHOSTRIDER      "Enable GhostRider algorithm" ON)
+option(WITH_FLEX            "Enable Flex algorithm" ON)
 option(WITH_HTTP            "Enable HTTP protocol support (client/server)" ON)
 option(WITH_DEBUG_LOG       "Enable debug log output" OFF)
 option(WITH_TLS             "Enable OpenSSL support" ON)
@@ -134,8 +135,6 @@ set(SOURCES_CRYPTO
     src/crypto/common/MemoryPool.cpp
     src/crypto/common/Nonce.cpp
     src/crypto/common/VirtualMemory.cpp
-    src/crypto/flex/flex.cpp
-    src/crypto/flex/flex_keccak.c
    )
 
 if (CMAKE_C_COMPILER_ID MATCHES GNU)
