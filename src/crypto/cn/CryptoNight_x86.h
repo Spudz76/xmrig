@@ -867,62 +867,6 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
 }
 
 
-#ifdef XMRIG_ALGO_CN_GPU
-template<size_t MEM>
-static NOINLINE void cn_explode_scratchpad_gpu(cryptonight_ctx *ctx)
-{
-    const uint8_t* input = reinterpret_cast<const uint8_t*>(ctx->state);
-    uint8_t* output = reinterpret_cast<uint8_t*>(ctx->memory);
-
-    constexpr size_t hash_size = 200; // 25x8 bytes
-    alignas(16) uint64_t hash[25];
-
-    for (uint64_t i = 0; i < MEM / 512; i++) {
-        memcpy(hash, input, hash_size);
-        hash[0] ^= i;
-
-        xmrig::keccakf(hash, 24);
-        memcpy(output, hash, 160);
-        output += 160;
-
-        xmrig::keccakf(hash, 24);
-        memcpy(output, hash, 176);
-        output += 176;
-
-        xmrig::keccakf(hash, 24);
-        memcpy(output, hash, 176);
-        output += 176;
-    }
-}
-
-
-template<Algorithm::Id ALGO, bool SOFT_AES>
-inline void cryptonight_single_hash_gpu(const uint8_t *__restrict__ input, size_t size, uint8_t *__restrict__ output, cryptonight_ctx **__restrict__ ctx, uint64_t height)
-{
-    constexpr CnAlgo<ALGO> props;
-
-    keccak(input, size, ctx[0]->state);
-    cn_explode_scratchpad_gpu<props.memory()>(ctx[0]);
-
-#   ifdef _MSC_VER
-    _control87(RC_NEAR, MCW_RC);
-#   else
-    fesetround(FE_TONEAREST);
-#   endif
-
-    if (xmrig::Cpu::info()->hasAVX2()) {
-        cn_gpu_inner_avx<props.iterations(), props.mask()>(ctx[0]->state, ctx[0]->memory);
-    } else {
-        cn_gpu_inner_ssse3<props.iterations(), props.mask()>(ctx[0]->state, ctx[0]->memory);
-    }
-
-    cn_implode_scratchpad<ALGO, SOFT_AES, 0>(ctx[0]);
-    keccakf(reinterpret_cast<uint64_t*>(ctx[0]->state), 24);
-    memcpy(output, ctx[0]->state, 32);
-}
-#endif
-
-
 } /* namespace xmrig */
 
 
