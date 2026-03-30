@@ -42,15 +42,6 @@ function cn_r()
 }
 
 
-function cn_gpu()
-{
-    const cn_gpu = opencl_minify(addIncludes('cryptonight_gpu.cl', [ 'wolf-aes.cl', 'keccak.cl' ]));
-
-    // fs.writeFileSync('cryptonight_gpu_gen.cl', cn_gpu);
-    fs.writeFileSync('cryptonight_gpu_cl.h', text2h(cn_gpu, 'xmrig', 'cryptonight_gpu_cl'));
-}
-
-
 function rx()
 {
     let rx = addIncludes('randomx.cl', [
@@ -58,6 +49,8 @@ function rx()
         'randomx_constants_monero.h',
         'randomx_constants_wow.h',
         'randomx_constants_arqma.h',
+        'randomx_constants_equilibria.h',
+        'randomx_constants_keva.h',
         'randomx_constants_graft.h',
         'aes.cl',
         'blake2b.cl',
@@ -82,6 +75,15 @@ function kawpow()
     // fs.writeFileSync('kawpow_gen.cl', kawpow);
     fs.writeFileSync('kawpow_cl.h', text2h(kawpow, 'xmrig', 'kawpow_cl'));
     fs.writeFileSync('kawpow_dag_cl.h', text2h(kawpow_dag, 'xmrig', 'kawpow_dag_cl'));
+}
+
+
+function cn_gpu()
+{
+    const cn_gpu = opencl_minify(addIncludes('cryptonight_gpu.cl', [ 'wolf-aes.cl', 'keccak.cl' ]));
+
+    // fs.writeFileSync('cryptonight_gpu_gen.cl', cn_gpu);
+    fs.writeFileSync('cryptonight_gpu_cl.h', text2h(cn_gpu, 'xmrig', 'cryptonight_gpu_cl'));
 }
 
 for (let i = 0; i < 2; i++) {
